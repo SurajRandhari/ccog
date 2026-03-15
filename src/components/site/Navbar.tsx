@@ -3,18 +3,40 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect, forwardRef } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/resources/sermons", label: "Sermons" },
-  { href: "/resources/devotions", label: "Devotions" },
-  { href: "/events", label: "Events" },
-  { href: "/contact", label: "Contact" },
+const aboutLinks = [
+  { href: "/about", label: "Our Story", description: "Learn about our history, mission and core values." },
+  { href: "/about/pastor", label: "Our Pastor", description: "Meet Rev. Suresh Randhari and his family." },
+  { href: "/about/membership", label: "Membership", description: "Find out how to become a part of our church family." },
+  { href: "/about/connect", label: "I'm New Here", description: "Everything you need to know for your first visit." },
+];
+
+const resourceLinks = [
+  { href: "/resources/sermons", label: "Sermons", description: "Watch and listen to recent messages." },
+  { href: "/resources/devotions", label: "Daily Devotions", description: "Start your day with spiritual encouragement." },
+  { href: "/resources/songs", label: "Songs & Lyrics", description: "Browse our library of worship songs." },
+  { href: "/resources/blog", label: "Church Blog", description: "Articles and updates from our community." },
+  { href: "/resources/downloads", label: "Downloads", description: "Forms, study materials, and other resources." },
 ];
 
 export default function Navbar() {
@@ -56,36 +78,71 @@ export default function Navbar() {
 
           {/* Desktop links */}
           <div className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => {
-              const isActive =
-                pathname === link.href ||
-                (link.href !== "/" && pathname.startsWith(link.href));
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <Link href="/" legacyBehavior passHref>
+                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), pathname === "/" && "text-neutral-900")}>
+                      Home
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
 
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`relative px-4 py-2 text-sm font-medium transition-colors ${
-                    isActive
-                      ? "text-neutral-900"
-                      : "text-neutral-500 hover:text-neutral-900"
-                  }`}
-                >
-                  {link.label}
-                  {isActive && (
-                    <motion.div
-                      layoutId="navbar-indicator"
-                      className="absolute bottom-0 left-2 right-2 h-0.5 bg-neutral-900 rounded-full"
-                      transition={{
-                        type: "spring",
-                        stiffness: 380,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                </Link>
-              );
-            })}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className={cn(pathname.startsWith("/about") && "text-neutral-900")}>
+                    About
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                      {aboutLinks.map((link) => (
+                        <ListItem
+                          key={link.href}
+                          title={link.label}
+                          href={link.href}
+                        >
+                          {link.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className={cn(pathname.startsWith("/resources") && "text-neutral-900")}>
+                    Resources
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                      {resourceLinks.map((link) => (
+                        <ListItem
+                          key={link.href}
+                          title={link.label}
+                          href={link.href}
+                        >
+                          {link.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link href="/events" legacyBehavior passHref>
+                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/events") && "text-neutral-900")}>
+                      Events
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link href="/contact" legacyBehavior passHref>
+                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/contact") && "text-neutral-900")}>
+                      Contact
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
 
           {/* Mobile menu */}
@@ -117,29 +174,95 @@ export default function Navbar() {
                 )}
               </AnimatePresence>
             </SheetTrigger>
-            <SheetContent side="right" className="w-80 pt-12">
-              <nav className="flex flex-col gap-1">
-                {navLinks.map((link) => {
-                  const isActive =
-                    pathname === link.href ||
-                    (link.href !== "/" && pathname.startsWith(link.href));
+            <SheetContent side="right" className="w-full sm:w-80 pt-12 overflow-y-auto">
+              <nav className="flex flex-col space-y-4">
+                <Link
+                  href="/"
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "px-4 py-2 text-lg font-medium transition-colors",
+                    pathname === "/" ? "text-neutral-900 bg-neutral-50 rounded-lg" : "text-neutral-600"
+                  )}
+                >
+                  Home
+                </Link>
 
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      className={`rounded-lg px-4 py-3 text-base font-medium transition-colors ${
-                        isActive
-                          ? "bg-neutral-100 text-neutral-900"
-                          : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="about" className="border-none">
+                    <AccordionTrigger className="px-4 py-2 text-lg hover:no-underline">
+                      About
+                    </AccordionTrigger>
+                    <AccordionContent className="bg-neutral-50 rounded-xl mt-1 p-2">
+                      <div className="flex flex-col space-y-1">
+                        {aboutLinks.map((link) => (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            onClick={() => setOpen(false)}
+                            className={cn(
+                              "px-4 py-3 rounded-lg text-sm transition-colors",
+                              pathname === link.href ? "text-neutral-900 font-semibold" : "text-neutral-600"
+                            )}
+                          >
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="resources" className="border-none mt-2">
+                    <AccordionTrigger className="px-4 py-2 text-lg hover:no-underline">
+                      Resources
+                    </AccordionTrigger>
+                    <AccordionContent className="bg-neutral-50 rounded-xl mt-1 p-2">
+                      <div className="flex flex-col space-y-1">
+                        {resourceLinks.map((link) => (
+                          <Link
+                            key={link.href}
+                            href={link.href}
+                            onClick={() => setOpen(false)}
+                            className={cn(
+                              "px-4 py-3 rounded-lg text-sm transition-colors",
+                              pathname === link.href ? "text-neutral-900 font-semibold" : "text-neutral-600"
+                            )}
+                          >
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+
+                <Link
+                  href="/events"
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "px-4 py-2 text-lg font-medium transition-colors",
+                    pathname.startsWith("/events") ? "text-neutral-900 bg-neutral-50 rounded-lg" : "text-neutral-600"
+                  )}
+                >
+                  Events
+                </Link>
+
+                <Link
+                  href="/contact"
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "px-4 py-2 text-lg font-medium transition-colors",
+                    pathname.startsWith("/contact") ? "text-neutral-900 bg-neutral-50 rounded-lg" : "text-neutral-600"
+                  )}
+                >
+                  Contact
+                </Link>
               </nav>
+
+              <div className="mt-12 px-4 pt-8 border-t border-neutral-100">
+                <Button className="w-full rounded-xl" onClick={() => setOpen(false)}>
+                  Plan Your Visit
+                </Button>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
@@ -147,3 +270,29 @@ export default function Navbar() {
     </motion.header>
   );
 }
+
+const ListItem = forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-neutral-50 hover:text-neutral-900 focus:bg-neutral-50 focus:text-neutral-900",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-semibold leading-none">{title}</div>
+          <p className="line-clamp-2 text-xs leading-snug text-neutral-500">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = "ListItem";

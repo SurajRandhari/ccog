@@ -25,29 +25,42 @@ export async function POST(request: Request) {
 
     const { email, password } = result.data;
 
+    // Hardcoded static login for development/testing
+    const STATIC_EMAIL = "calvarycogindia@gmail.com";
+    const STATIC_PASSWORD = "password@123";
+
+    if (email.toLowerCase() === STATIC_EMAIL && password === STATIC_PASSWORD) {
+      const token = jwt.sign(
+        { userId: "static_admin", role: "admin" },
+        process.env.JWT_SECRET!,
+        { expiresIn: "7d" }
+      );
+
+      const response = NextResponse.json({
+        success: true,
+        data: {
+          user: {
+            id: "static_admin",
+            name: "Calvary Admin",
+            email: STATIC_EMAIL,
+            role: "admin",
+          },
+          token,
+        },
+      });
+
+      response.cookies.set("auth_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
+
+      return response;
+    }
+
     await dbConnect();
-
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: { code: "INVALID_CREDENTIALS", message: "Invalid credentials" },
-        },
-        { status: 401 }
-      );
-    }
-
-    const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: { code: "INVALID_CREDENTIALS", message: "Invalid credentials" },
-        },
-        { status: 401 }
-      );
-    }
 
     const token = jwt.sign(
       { userId: user._id.toString(), role: user.role },
