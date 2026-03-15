@@ -76,8 +76,14 @@ export default function SermonsPage() {
             transition={{ duration: 0.6 }}
             className="group relative overflow-hidden rounded-[2.5rem] bg-neutral-900 shadow-2xl"
           >
-            <div className="aspect-[21/9] w-full bg-neutral-800" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute inset-0 z-0">
+              <img
+                src="/images/site/hero.png"
+                alt="Featured Sermon"
+                className="h-full w-full object-cover opacity-60 transition-transform duration-1000 group-hover:scale-105"
+              />
+            </div>
+            <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
               <div className="max-w-3xl">
                 <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-md">
@@ -136,7 +142,13 @@ export default function SermonsPage() {
                   href={`/resources/sermons/${sermon.id}`}
                   className="group block overflow-hidden rounded-2xl border border-neutral-200 bg-white transition-all hover:border-neutral-300 hover:shadow-xl hover:shadow-neutral-200"
                 >
-                  <div className="aspect-video w-full bg-neutral-100 transition-transform duration-500 group-hover:scale-105" />
+                  <div className="relative aspect-video w-full overflow-hidden bg-neutral-100">
+                    <img
+                      src={i % 2 === 0 ? "/images/site/vision.png" : "/images/site/hero.png"}
+                      alt={sermon.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
                   <div className="p-6">
                     <span className="text-xs font-semibold tracking-wider text-neutral-400 uppercase">
                       {sermon.series}

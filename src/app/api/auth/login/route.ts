@@ -62,6 +62,28 @@ export async function POST(request: Request) {
 
     await dbConnect();
 
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: "INVALID_CREDENTIALS", message: "Invalid credentials" },
+        },
+        { status: 401 }
+      );
+    }
+
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: "INVALID_CREDENTIALS", message: "Invalid credentials" },
+        },
+        { status: 401 }
+      );
+    }
+
     const token = jwt.sign(
       { userId: user._id.toString(), role: user.role },
       process.env.JWT_SECRET!,

@@ -23,6 +23,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 
 const aboutLinks = [
   { href: "/about", label: "Our Story", description: "Learn about our history, mission and core values." },
@@ -127,6 +128,14 @@ export default function Navbar() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
+                  <Link href="/offering" legacyBehavior passHref>
+                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/offering") && "text-neutral-900")}>
+                      Offering
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
                   <Link href="/events" legacyBehavior passHref>
                     <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/events") && "text-neutral-900")}>
                       Events
@@ -143,6 +152,14 @@ export default function Navbar() {
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
+
+            <div className="ml-4">
+              <Link href="/about/connect">
+                <InteractiveHoverButton className="w-40 text-xs">
+                  New Here
+                </InteractiveHoverButton>
+              </Link>
+            </div>
           </div>
 
           {/* Mobile menu */}
@@ -236,6 +253,17 @@ export default function Navbar() {
                 </Accordion>
 
                 <Link
+                  href="/offering"
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "px-4 py-2 text-lg font-medium transition-colors",
+                    pathname.startsWith("/offering") ? "text-neutral-900 bg-neutral-50 rounded-lg" : "text-neutral-600"
+                  )}
+                >
+                  Offering
+                </Link>
+
+                <Link
                   href="/events"
                   onClick={() => setOpen(false)}
                   className={cn(
@@ -259,9 +287,11 @@ export default function Navbar() {
               </nav>
 
               <div className="mt-12 px-4 pt-8 border-t border-neutral-100">
-                <Button className="w-full rounded-xl" onClick={() => setOpen(false)}>
-                  Plan Your Visit
-                </Button>
+                <Link href="/about/connect" onClick={() => setOpen(false)}>
+                  <InteractiveHoverButton className="w-full">
+                    New Here
+                  </InteractiveHoverButton>
+                </Link>
               </div>
             </SheetContent>
           </Sheet>

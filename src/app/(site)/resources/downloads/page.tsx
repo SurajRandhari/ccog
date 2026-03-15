@@ -43,8 +43,11 @@ export default function DownloadsPage() {
   return (
     <div className="bg-white">
       {/* Header */}
-      <section className="relative py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <section className="relative overflow-hidden py-24 lg:py-32">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,0,0,0.05)_0%,transparent_50%)]" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial="hidden"
             animate="visible"

@@ -39,18 +39,26 @@ export default function HomePage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden bg-white">
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(0,0,0,0.02)_0%,transparent_50%)]" />
-        <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-neutral-100/50 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-neutral-50 blur-3xl" />
+      <section className="relative flex min-h-[90vh] items-center justify-center overflow-hidden bg-neutral-900">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/site/hero.png"
+            alt="Church Sanctuary"
+            className="h-full w-full object-cover opacity-40 mix-blend-overlay"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-transparent" />
+        </div>
+        
+        <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-white/5 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-32 text-center lg:px-8">
+        <div className="relative z-10 mx-auto max-w-7xl px-6 py-32 text-center lg:px-8">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-sm font-medium tracking-[0.2em] text-neutral-400 uppercase"
+            className="text-sm font-medium tracking-[0.2em] text-white/60 uppercase"
           >
             Welcome to
           </motion.p>
@@ -59,18 +67,18 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-6 font-serif text-5xl font-semibold tracking-tight text-neutral-900 sm:text-6xl lg:text-7xl"
+            className="mt-6 font-serif text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl"
           >
             Calvary Church
             <br />
-            <span className="text-neutral-400">of God</span>
+            <span className="text-white/60">of God</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-neutral-500 sm:text-xl"
+            className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/70 sm:text-xl"
           >
             A community of faith, hope, and love — growing together in the
             grace and knowledge of our Lord Jesus Christ.
@@ -82,11 +90,11 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
           >
-            <Button render={<Link href="/about/connect" />} size="lg" className="gap-2 px-8">
+            <Button render={<Link href="/about/connect" />} size="lg" className="gap-2 border-none bg-white text-neutral-900 hover:bg-neutral-100 px-8">
               I&apos;m New Here
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button render={<Link href="/resources/sermons" />} variant="outline" size="lg" className="px-8">
+            <Button render={<Link href="/resources/sermons" />} variant="outline" size="lg" className="px-8 border-white/20 text-white hover:bg-white/10">
               Watch Sermons
             </Button>
           </motion.div>
@@ -161,14 +169,24 @@ export default function HomePage() {
       </section>
 
       {/* Vision Statement */}
-      <section className="bg-neutral-950 py-24 lg:py-32">
-        <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
+      <section className="relative overflow-hidden bg-neutral-950 py-24 lg:py-32">
+        {/* Background Image with Blur */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/site/vision.png"
+            alt="Vision Background"
+            className="h-full w-full object-cover opacity-20 blur-sm scale-110"
+          />
+          <div className="absolute inset-0 bg-neutral-950/60" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-4xl px-6 text-center lg:px-8">
           <motion.blockquote
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="font-serif text-2xl font-normal leading-relaxed text-white/90 italic sm:text-3xl lg:text-4xl"
+            className="font-serif text-2xl font-normal leading-relaxed text-white italic sm:text-3xl lg:text-4xl"
           >
             &ldquo;For where two or three gather in my name, there am I with
             them.&rdquo;

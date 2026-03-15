@@ -82,12 +82,13 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="relative aspect-video overflow-hidden rounded-2xl bg-neutral-200"
+              className="relative aspect-video overflow-hidden rounded-2xl bg-neutral-200 shadow-xl"
             >
-              {/* Placeholder for church image */}
-              <div className="absolute inset-0 flex items-center justify-center text-neutral-400">
-                Church Image Placeholder
-              </div>
+              <img
+                src="/images/site/hero.png"
+                alt="Our Sanctuary"
+                className="h-full w-full object-cover"
+              />
             </motion.div>
           </div>
         </div>

@@ -48,8 +48,11 @@ export default function BlogPage() {
   return (
     <div className="bg-white">
       {/* Header */}
-      <section className="relative py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <section className="relative overflow-hidden py-24 lg:py-32">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,0,0,0.05)_0%,transparent_50%)]" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -81,10 +84,15 @@ export default function BlogPage() {
                 variants={fadeInUp}
                 className="group flex flex-col items-start"
               >
-                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2rem] bg-neutral-200">
-                  <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105" />
-                  <div className="absolute top-4 left-4">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-neutral-900 backdrop-blur-sm">
+                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2.5rem] bg-neutral-200 shadow-xl shadow-neutral-200/50">
+                  <img
+                    src={i % 3 === 0 ? "/images/site/vision.png" : i % 3 === 1 ? "/images/site/hero.png" : "/images/site/pastor.png"}
+                    alt={post.title}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute top-6 left-6">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-4 py-1.5 text-xs font-bold text-neutral-900 backdrop-blur-sm shadow-sm">
                       <Tag className="h-3 w-3" />
                       {post.category}
                     </span>

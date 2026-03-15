@@ -41,10 +41,11 @@ export default function PastorPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-neutral-100 shadow-2xl shadow-neutral-200 lg:max-w-md lg:justify-self-end"
             >
-              {/* Placeholder for Pastor's Photo */}
-              <div className="absolute inset-0 flex items-center justify-center text-neutral-400">
-                Pastor's Photo Placeholder
-              </div>
+              <img
+                src="/images/site/pastor.png"
+                alt="Rev. Suresh Randhari"
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+              />
             </motion.div>
           </div>
         </div>
