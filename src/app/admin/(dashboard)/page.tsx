@@ -1,164 +1,192 @@
 "use client";
 
-import { motion } from "framer-motion";
-import Link from "next/link";
-import {
-  Video,
-  Newspaper,
-  Calendar,
-  Users,
-  Plus,
-  ArrowRight,
+import { useEffect, useState } from "react";
+import { 
+  Music, 
+  Video, 
+  Calendar, 
+  Newspaper, 
+  MessageSquare,
   TrendingUp,
-  Activity,
+  ArrowRight
 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import { motion } from "framer-motion";
 
-const stats = [
-  { name: "Total Sermons", value: "24", icon: Video, color: "text-blue-600", bg: "bg-blue-50" },
-  { name: "Blog Posts", value: "12", icon: Newspaper, color: "text-purple-600", bg: "bg-purple-50" },
-  { name: "Upcoming Events", value: "5", icon: Calendar, color: "text-amber-600", bg: "bg-amber-50" },
-  { name: "Site Visitors", value: "1.2k", icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
-];
+interface Stats {
+  totalSongs: number;
+  totalSermons: number;
+  upcomingEvents: number;
+  totalBlogs: number;
+  prayerRequests: number;
+}
 
-const recentActivity = [
-  {
-    id: 1,
-    type: "sermon",
-    title: "New Sermon Published",
-    detail: "The Power of Radical Love",
-    time: "2 hours ago",
-  },
-  {
-    id: 2,
-    type: "blog",
-    title: "New Blog Post",
-    detail: "The Importance of Community",
-    time: "5 hours ago",
-  },
-  {
-    id: 3,
-    type: "event",
-    title: "Event Updated",
-    detail: "Sunday Worship Service",
-    time: "Yesterday",
-  },
-];
+export default function AdminDashboard() {
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export default function AdminDashboardPage() {
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/admin/stats");
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch stats", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const statCards = [
+    { 
+      title: "Total Songs", 
+      value: stats?.totalSongs || 0, 
+      icon: Music, 
+      color: "text-blue-600", 
+      bg: "bg-blue-50",
+      href: "/admin/songs",
+      description: "Digital hymn book entries"
+    },
+    { 
+      title: "Total Sermons", 
+      value: stats?.totalSermons || 0, 
+      icon: Video, 
+      color: "text-purple-600", 
+      bg: "bg-purple-50",
+      href: "/admin/sermons",
+      description: "Video archive"
+    },
+    { 
+      title: "Upcoming Events", 
+      value: stats?.upcomingEvents || 0, 
+      icon: Calendar, 
+      color: "text-orange-600", 
+      bg: "bg-orange-50",
+      href: "/admin/events",
+      description: "Next 30 days"
+    },
+    { 
+      title: "Blog Posts", 
+      value: stats?.totalBlogs || 0, 
+      icon: Newspaper, 
+      color: "text-green-600", 
+      bg: "bg-green-50",
+      href: "/admin/blog",
+      description: "Published articles"
+    },
+    { 
+      title: "Prayer Requests", 
+      value: stats?.prayerRequests || 0, 
+      icon: MessageSquare, 
+      color: "text-rose-600", 
+      bg: "bg-rose-50",
+      href: "/admin/prayer-requests",
+      description: "Member submissions"
+    },
+  ];
+
   return (
-    <div className="space-y-10">
-      {/* Welcome Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="font-serif text-3xl font-bold text-neutral-900">Dashboard Overview</h1>
-          <p className="mt-1 text-neutral-500">Welcome back! Here&apos;s what&apos;s happening with your site.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" className="rounded-xl">
-            View Public Site
-          </Button>
-          <Button className="rounded-xl gap-2 shadow-lg shadow-neutral-200">
-            <Plus className="h-4 w-4" />
-            Quick Add
-          </Button>
-        </div>
+    <div className="space-y-8">
+      <div>
+        <h1 className="font-serif text-3xl font-bold text-neutral-900">Dashboard Overview</h1>
+        <p className="mt-2 text-neutral-500">Welcome back. Here's what's happening at Calvary Church.</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, i) => (
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {statCards.map((stat, index) => (
           <motion.div
-            key={stat.name}
+            key={stat.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
+            transition={{ delay: index * 0.1 }}
           >
-            <Card className="border-neutral-200/60 shadow-sm transition-all hover:shadow-md">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-neutral-500">{stat.name}</p>
-                    <h3 className="mt-1 text-3xl font-bold text-neutral-900">{stat.value}</h3>
+            <Link href={stat.href}>
+              <Card className="group overflow-hidden border-neutral-200 transition-all hover:shadow-xl hover:-translate-y-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-neutral-500">
+                    {stat.title}
+                  </CardTitle>
+                  <div className={`rounded-full p-2 ${stat.bg}`}>
+                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
                   </div>
-                  <div className={stat.bg + " p-3 rounded-2xl"}>
-                    <stat.icon className={stat.color + " h-6 w-6"} />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-3xl font-bold tracking-tight text-neutral-900">
+                      {loading ? "..." : stat.value}
+                    </div>
+                    <Badge variant="secondary" className="bg-neutral-100 text-neutral-600">
+                      <TrendingUp className="mr-1 h-3 w-3 text-neutral-400" />
+                      Live
+                    </Badge>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                  <CardDescription className="mt-2 flex items-center gap-1 text-xs transition-colors group-hover:text-neutral-900">
+                    {stat.description}
+                    <ArrowRight className="h-3 w-3 opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        {/* Recent Activity */}
-        <div className="lg:col-span-2">
-          <Card className="border-neutral-200/60 shadow-sm h-full">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Activity className="h-5 w-5 text-neutral-400" />
-                Recent Activity
-              </CardTitle>
-              <Button variant="ghost" size="sm" className="text-neutral-500 hover:text-neutral-900">
-                View All
-              </Button>
-            </CardHeader>
-            <CardContent className="px-0">
-              <div className="divide-y divide-neutral-100">
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between px-6 py-4 hover:bg-neutral-50 transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 flex-shrink-0 rounded-full bg-neutral-100 flex items-center justify-center">
-                        {activity.type === "sermon" && <Video className="h-4 w-4 text-blue-600" />}
-                        {activity.type === "blog" && <Newspaper className="h-4 w-4 text-purple-600" />}
-                        {activity.type === "event" && <Calendar className="h-4 w-4 text-amber-600" />}
-                      </div>
-                      <div>
-                        <p className="font-medium text-neutral-900">{activity.title}</p>
-                        <p className="text-sm text-neutral-500">{activity.detail}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs text-neutral-400">{activity.time}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <Separator className="bg-neutral-200" />
 
-        {/* Quick Actions / Suggestions */}
-        <div>
-          <Card className="border-neutral-200/60 shadow-sm overflow-hidden">
-            <div className="bg-neutral-900 p-6 text-white">
-              <h3 className="font-semibold">Need Help?</h3>
-              <p className="mt-1 text-sm text-white/60">Explore our documentation for managing your church platform.</p>
-              <Button variant="outline" className="mt-4 w-full border-white/20 text-white hover:bg-white/10">
-                Open Guide
+      {/* Recent Activity Placeholder or Quick Actions */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="border-neutral-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-serif">Quick Actions</CardTitle>
+            <CardDescription>Shortcut to common tasks</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <Link href="/admin/songs">
+              <Button variant="outline" className="w-full justify-start gap-2 hover:bg-neutral-50">
+                <Music className="h-4 w-4 text-blue-600" />
+                Add New Song to Hymn Book
               </Button>
-            </div>
-            <CardContent className="p-6">
-              <h4 className="font-semibold text-neutral-900 mb-4">Site Performance</h4>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-neutral-500">Page Speed</span>
-                  <span className="font-medium text-emerald-600">Optimal</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-neutral-500">Storage Used</span>
-                  <span className="font-medium">2.4 / 10 GB</span>
-                </div>
-                <div className="mt-6 border-t border-neutral-100 pt-4">
-                  <Link href="/admin/settings" className="group flex items-center justify-between text-sm font-medium text-neutral-900">
-                    Review Site Settings
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </div>
+            </Link>
+            <Link href="/admin/sermons">
+              <Button variant="outline" className="w-full justify-start gap-2 hover:bg-neutral-50">
+                <Video className="h-4 w-4 text-purple-600" />
+                Upload New Sermon Video
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="border-neutral-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg font-serif">System Status</CardTitle>
+            <CardDescription>Real-time connectivity overview</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="text-sm font-medium">Database Connection</span>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <Badge variant="outline" className="text-emerald-600 border-emerald-100 bg-emerald-50">Healthy</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="text-sm font-medium">Authentication Service</span>
+              </div>
+              <Badge variant="outline" className="text-emerald-600 border-emerald-100 bg-emerald-50">Active</Badge>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

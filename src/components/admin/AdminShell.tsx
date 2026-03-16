@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -20,6 +20,9 @@ import {
   Bell,
   Search,
   User,
+  Users,
+  MessageSquare,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -31,18 +34,54 @@ interface AdminShellProps {
 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Sermons", href: "/admin/sermons", icon: Video },
-  { name: "Devotions", href: "/admin/devotions", icon: BookOpen },
   { name: "Songs", href: "/admin/songs", icon: Music },
-  { name: "Blog Posts", href: "/admin/blog", icon: Newspaper },
-  { name: "Downloads", href: "/admin/downloads", icon: Download },
+  { name: "Sermons", href: "/admin/sermons", icon: Video },
   { name: "Events", href: "/admin/events", icon: Calendar },
+  { name: "Blog", href: "/admin/blog", icon: Newspaper },
+  { name: "Activity Logs", href: "/admin/logs", icon: Shield, adminOnly: true },
+  { name: "Prayer Requests", href: "/admin/prayer-requests", icon: MessageSquare },
+  { name: "User Management", href: "/admin/users", icon: Users, adminOnly: true },
+  { name: "Devotions", href: "/admin/devotions", icon: BookOpen },
+  { name: "Downloads", href: "/admin/downloads", icon: Download },
   { name: "Site Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminShell({ children }: AdminShellProps) {
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [user, setUser] = useState<{ email: string; role: string; name: string } | null>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    // In a real app, this would be in a context provider.
+    // For now, we'll fetch basic info to handle UI roles.
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/admin/me"); // We'll need to create this simple route
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user", err);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const filteredNavItems = navItems.filter(item => !item.adminOnly || user?.role === "admin");
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("/api/admin/logout", { method: "POST" });
+      if (res.ok) {
+        router.push("/admin/login");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-neutral-50/50">
@@ -54,7 +93,7 @@ export default function AdminShell({ children }: AdminShellProps) {
           </Link>
         </div>
         <nav className="flex flex-col gap-1 p-4">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -83,7 +122,11 @@ export default function AdminShell({ children }: AdminShellProps) {
           })}
         </nav>
         <div className="mt-auto border-t border-neutral-100 p-4">
-          <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl text-neutral-500 hover:text-red-600">
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            className="w-full justify-start gap-3 rounded-xl text-neutral-500 hover:text-red-600"
+          >
             <LogOut className="h-4 w-4" />
             Sign Out
           </Button>
@@ -106,7 +149,7 @@ export default function AdminShell({ children }: AdminShellProps) {
                   <span className="font-serif text-xl font-bold text-neutral-900">Calvary Admin</span>
                 </div>
                 <nav className="flex flex-col gap-1 p-4">
-                  {navItems.map((item) => {
+                  {filteredNavItems.map((item) => {
                     const isActive = pathname === item.href;
                     return (
                       <Link
@@ -125,6 +168,16 @@ export default function AdminShell({ children }: AdminShellProps) {
                       </Link>
                     );
                   })}
+                  <div className="mt-auto border-t border-neutral-100 p-4">
+                    <Button
+                      variant="ghost"
+                      onClick={handleLogout}
+                      className="w-full justify-start gap-3 rounded-xl text-neutral-500 hover:text-red-600"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign Out
+                    </Button>
+                  </div>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -139,6 +192,9 @@ export default function AdminShell({ children }: AdminShellProps) {
           </div>
 
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="relative rounded-full" onClick={handleLogout}>
+              <LogOut className="h-5 w-5 text-neutral-400 hover:text-red-600" />
+            </Button>
             <Button variant="ghost" size="icon" className="relative rounded-full">
               <Bell className="h-5 w-5 text-neutral-500" />
               <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />

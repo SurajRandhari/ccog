@@ -16,7 +16,7 @@ if (!global.mongoose) {
   global.mongoose = cached;
 }
 
-async function dbConnect(): Promise<typeof mongoose> {
+export async function connectDB(): Promise<typeof mongoose> {
   if (cached.conn) {
     return cached.conn;
   }
@@ -39,13 +39,15 @@ async function dbConnect(): Promise<typeof mongoose> {
 
   try {
     cached.conn = await cached.promise;
+    console.log("Connected to MongoDB established");
   } catch (e) {
     cached.promise = null;
+    console.error("Error connecting to MongoDB", e);
     throw e;
   }
 
   return cached.conn;
 }
 
-export default dbConnect;
+export default connectDB;
 

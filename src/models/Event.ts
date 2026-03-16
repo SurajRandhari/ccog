@@ -3,15 +3,11 @@ import mongoose, { Schema, Document, Model, Types } from "mongoose";
 export interface IEvent extends Document {
   title: string;
   slug: string;
-  type: "regular" | "upcoming";
   description: string;
-  startDate: Date;
-  endDate: Date | null;
+  location: string;
+  date: Date;
   time: string;
-  location: string | null;
-  imageUrl: string | null;
-  isRecurring: boolean;
-  recurrencePattern: string | null;
+  image: string;
   status: "draft" | "published";
   createdBy: Types.ObjectId;
   createdAt: Date;
@@ -22,23 +18,15 @@ const eventSchema = new Schema<IEvent>(
   {
     title: { type: String, required: true, trim: true, maxlength: 200 },
     slug: { type: String, unique: true, trim: true },
-    type: {
-      type: String,
-      enum: ["regular", "upcoming"],
-      required: true,
-    },
     description: { type: String, required: true },
-    startDate: { type: Date, required: true },
-    endDate: { type: Date, default: null },
+    location: { type: String, required: true, trim: true },
+    date: { type: Date, required: true },
     time: { type: String, required: true, trim: true },
-    location: { type: String, default: null, trim: true },
-    imageUrl: { type: String, default: null },
-    isRecurring: { type: Boolean, default: false },
-    recurrencePattern: { type: String, default: null, trim: true },
+    image: { type: String, required: true },
     status: {
       type: String,
       enum: ["draft", "published"],
-      default: "draft",
+      default: "published",
       required: true,
     },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },

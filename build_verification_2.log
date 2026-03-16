@@ -1,0 +1,24 @@
+
+> ccog@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 9.9s
+  Running TypeScript ...
+Failed to compile.
+
+./src/app/(site)/resources/songs/[slug]/page.tsx:47:19
+Type error: Property 'songNumber' does not exist on type 'Document<unknown, {}, ISong, {}, DefaultSchemaOptions> & ISong & Required<{ _id: ObjectId; }> & { __v: number; } & { ...; }'.
+
+  45 |                 </div>
+  46 |             </div>
+> 47 |             {song.songNumber && (
+     |                   ^
+  48 |                 <span className="inline-flex items-center rounded-full bg-neutral-100 px-4 py-1.5 text-xs font-bold text-neutral-500 uppercase tracking-widest mb-6 border border-neutral-200">
+  49 |                     No. {song.songNumber}
+  50 |                 </span>
+Next.js build worker exited with code: 1 and signal: null

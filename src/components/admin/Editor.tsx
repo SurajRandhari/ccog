@@ -4,6 +4,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
 import { 
   Bold, 
   Italic, 
@@ -127,14 +128,17 @@ export default function Editor({ content, onChange, placeholder }: EditorProps) 
       Link.configure({
         openOnClick: false,
       }),
+      Placeholder.configure({
+        placeholder: placeholder || "Start typing...",
+      }),
     ],
     content: content,
-    onUpdate: ({ editor }) => {
+    onUpdate: ({ editor }: { editor: any }) => {
       onChange(editor.getHTML());
     },
     editorProps: {
       attributes: {
-        class: "prose prose-sm max-w-none focus:outline-none min-h-[300px] p-6 text-neutral-900",
+        class: "prose prose-sm max-w-none focus:outline-none min-h-[300px] p-6 text-neutral-900 [&_.is-editor-empty:first-child::before]:text-neutral-400 [&_.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.is-editor-empty:first-child::before]:float-left [&_.is-editor-empty:first-child::before]:pointer-events-none [&_.is-editor-empty:first-child::before]:h-0",
       },
     },
   });

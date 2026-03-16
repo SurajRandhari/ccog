@@ -3,10 +3,9 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IUser extends Document {
   name: string;
   email: string;
-  passwordHash: string;
-  role: "admin" | "editor";
-  avatar: string | null;
-  lastLoginAt: Date | null;
+  password: string; // Hashed password
+  role: "admin" | "editor" | "viewonly";
+  lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,15 +20,14 @@ const userSchema = new Schema<IUser>(
       lowercase: true,
       trim: true,
     },
-    passwordHash: { type: String, required: true },
+    password: { type: String, required: true },
     role: {
       type: String,
-      enum: ["admin", "editor"],
-      default: "editor",
+      enum: ["admin", "editor", "viewonly"],
+      default: "viewonly",
       required: true,
     },
-    avatar: { type: String, default: null },
-    lastLoginAt: { type: Date, default: null },
+    lastLoginAt: { type: Date },
   },
   {
     timestamps: true,

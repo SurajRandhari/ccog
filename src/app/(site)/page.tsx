@@ -23,7 +23,7 @@ const fadeInUp = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: [0.21, 0.45, 0.32, 0.9] },
+    transition: { delay: i * 0.1, duration: 0.6, ease: [0.21, 0.45, 0.32, 0.9] as const },
   }),
 };
 
@@ -86,7 +86,7 @@ export default function HomePage() {
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.21, 0.45, 0.32, 0.9] }}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.21, 0.45, 0.32, 0.9] as const }}
             className="font-serif text-6xl font-semibold tracking-tight text-white sm:text-8xl lg:text-9xl mb-8 leading-tight"
           >
             Calvary Church
@@ -97,7 +97,7 @@ export default function HomePage() {
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.45, 0.32, 0.9] }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.45, 0.32, 0.9] as const }}
             className="mx-auto max-w-2xl text-lg leading-relaxed text-white/60 sm:text-2xl font-light mb-12"
           >
             A community of faith, hope, and love — growing together in the
@@ -107,7 +107,7 @@ export default function HomePage() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.21, 0.45, 0.32, 0.9] }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.21, 0.45, 0.32, 0.9] as const }}
             className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center"
           >
             <Link href="/about/connect">

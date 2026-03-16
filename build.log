@@ -1,0 +1,30 @@
+
+> ccog@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+ΓÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 11.2s
+  Running TypeScript ...
+Failed to compile.
+
+.next/types/validator.ts:342:31
+Type error: Type 'typeof import("D:/Project/Nextjs/ccog/src/app/api/admin/users/[id]/route")' does not satisfy the constraint 'RouteHandlerConfig<"/api/admin/users/[id]">'.
+  Types of property 'PUT' are incompatible.
+    Type '(req: NextRequest, { params }: { params: { id: string; }; }) => Promise<NextResponse<{ success: boolean; data: (Document<unknown, {}, IUser, {}, DefaultSchemaOptions> & IUser & Required<...> & { ...; } & { ...; }) | null; }> | NextResponse<...>>' is not assignable to type '(request: NextRequest, context: { params: Promise<{ id: string; }>; }) => void | Response | Promise<void | Response>'.
+      Types of parameters '__1' and 'context' are incompatible.
+        Type '{ params: Promise<{ id: string; }>; }' is not assignable to type '{ params: { id: string; }; }'.
+          Types of property 'params' are incompatible.
+            Property 'id' is missing in type 'Promise<{ id: string; }>' but required in type '{ id: string; }'.
+
+  340 |   type __IsExpected<Specific extends RouteHandlerConfig<"/api/admin/users/[id]">> = Specific
+  341 |   const handler = {} as typeof import("../../src/app/api/admin/users/[id]/route.js")
+> 342 |   type __Check = __IsExpected<typeof handler>
+      |                               ^
+  343 |   // @ts-ignore
+  344 |   type __Unused = __Check
+  345 | }
+Next.js build worker exited with code: 1 and signal: null

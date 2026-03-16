@@ -4,11 +4,12 @@ import Song from "@/models/Song";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     await dbConnect();
-    const song = await Song.findOne({ slug: params.slug, status: "published" });
+    const song = await Song.findOne({ slug, status: "published" });
 
     if (!song) {
       return NextResponse.json(

@@ -6,11 +6,12 @@ import { generateSlug } from "@/lib/slug";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await dbConnect();
-    const song = await Song.findById(params.id);
+    const song = await Song.findById(id);
 
     if (!song) {
       return NextResponse.json(
@@ -34,9 +35,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const result = songSchema.safeParse(body);
 
@@ -64,14 +66,14 @@ export async function PUT(
     if (songData.slug) {
         let finalSlug = songData.slug;
         let counter = 1;
-        while (await Song.exists({ slug: finalSlug, _id: { $ne: params.id } })) {
+        while (await Song.exists({ slug: finalSlug, _id: { $ne: id } })) {
           finalSlug = `${songData.slug}-${counter}`;
           counter++;
         }
         songData.slug = finalSlug;
     }
 
-    const song = await Song.findByIdAndUpdate(params.id, songData, { new: true });
+    const song = await Song.findByIdAndUpdate(id, songData, { new: true });
 
     if (!song) {
       return NextResponse.json(
@@ -95,11 +97,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await dbConnect();
-    const song = await Song.findByIdAndDelete(params.id);
+    const song = await Song.findByIdAndDelete(id);
 
     if (!song) {
       return NextResponse.json(

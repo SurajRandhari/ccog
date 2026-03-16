@@ -3,14 +3,14 @@ import mongoose, { Schema, Document, Model, Types } from "mongoose";
 export interface ISong extends Document {
   title: string;
   slug: string;
-  songNumber: string | null;
-  author: string | null;
+  songNumber?: string | null;
   lyrics: string | null;
-  category: string;
-  language: string;
-  tags: string[];
+  language: "Hindi" | "English" | "Odia";
+  author: string | null;
+  category: "worship" | "praise" | "traditional";
   status: "draft" | "published";
-  isLive: boolean;
+  isLive?: boolean;
+  tags: string[];
   createdBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -20,15 +20,28 @@ const songSchema = new Schema<ISong>(
   {
     title: { type: String, required: true, trim: true, maxlength: 200 },
     slug: { type: String, unique: true, trim: true },
-    songNumber: { type: String, default: null, trim: true },
-    author: { type: String, default: null, trim: true },
-    lyrics: { type: String, default: null },
-    category: { type: String, required: true, default: "Worship", trim: true },
-    language: { type: String, required: true, default: "English", trim: true },
+    songNumber: { type: String, trim: true, default: null },
+    lyrics: { type: String, required: true },
+    language: { 
+      type: String, 
+      required: true, 
+      enum: ["Hindi", "English", "Odia"],
+      default: "English",
+      trim: true 
+    },
+    author: { type: String, required: true, default: "Unknown", trim: true },
+    category: { 
+      type: String, 
+      required: true, 
+      enum: ["worship", "praise", "traditional"],
+      default: "worship",
+      trim: true 
+    },
     tags: [{ type: String, trim: true }],
     status: {
       type: String,
       enum: ["draft", "published"],
+      default: "published",
       required: true,
     },
     isLive: { type: Boolean, default: false },
