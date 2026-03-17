@@ -61,9 +61,12 @@ export async function middleware(request: NextRequest) {
       // 3. Admin Page Access
       // (role viewonly, editor, admin can all see the dashboard, but their UI should reflect permissions)
       
+      const userId = payload.userId ? String(payload.userId) : "";
+      const userEmail = payload.email ? String(payload.email) : "unknown";
+      
       const requestHeaders = new Headers(request.headers);
-      requestHeaders.set("x-user-id", payload.userId as string);
-      requestHeaders.set("x-user-email", payload.email as string);
+      requestHeaders.set("x-user-id", userId);
+      requestHeaders.set("x-user-email", userEmail);
       requestHeaders.set("x-user-role", role);
 
       return NextResponse.next({

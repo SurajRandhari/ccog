@@ -138,7 +138,7 @@ export default function Editor({ content, onChange, placeholder }: EditorProps) 
     },
     editorProps: {
       attributes: {
-        class: "prose prose-sm max-w-none focus:outline-none min-h-[300px] p-6 text-neutral-900 [&_.is-editor-empty:first-child::before]:text-neutral-400 [&_.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.is-editor-empty:first-child::before]:float-left [&_.is-editor-empty:first-child::before]:pointer-events-none [&_.is-editor-empty:first-child::before]:h-0",
+        class: "prose prose-sm max-w-none focus:outline-none min-h-[250px] p-6 text-neutral-900 [&_.is-editor-empty:first-child::before]:text-neutral-400 [&_.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.is-editor-empty:first-child::before]:float-left [&_.is-editor-empty:first-child::before]:pointer-events-none [&_.is-editor-empty:first-child::before]:h-0",
       },
     },
   });
@@ -146,7 +146,9 @@ export default function Editor({ content, onChange, placeholder }: EditorProps) 
   return (
     <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white ring-offset-white focus-within:ring-2 focus-within:ring-neutral-900 focus-within:ring-offset-2">
       <MenuBar editor={editor} />
-      <EditorContent editor={editor} />
+      <div className="max-h-[450px] overflow-y-auto custom-scrollbar">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }

@@ -322,72 +322,75 @@ export default function SongsAdminPage() {
         </div>
       )}
 
-      {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
-          <DialogHeader className="p-8 pb-0">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+          <DialogHeader className="p-8 pb-0 shrink-0">
             <DialogTitle className="font-serif text-2xl">{editingSong ? "Edit Song" : "Add New Song"}</DialogTitle>
             <DialogDescription>Fill in the details to update the digital hymn book.</DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="p-8 space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
+          
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-8 pt-6 space-y-6 custom-scrollbar">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Song Title</Label>
+                  <Input 
+                    id="title" 
+                    value={formData.title} 
+                    onChange={e => setFormData({...formData, title: e.target.value})} 
+                    placeholder="Enter song title..."
+                    required
+                    className="rounded-xl border-neutral-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="author">Author / Composer</Label>
+                  <Input 
+                    id="author" 
+                    value={formData.author} 
+                    onChange={e => setFormData({...formData, author: e.target.value as string})} 
+                    placeholder="Unknown"
+                    className="rounded-xl border-neutral-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Language</Label>
+                  <Select value={formData.language || "English"} onValueChange={(v: string | null) => setFormData({...formData, language: v || "English"})}>
+                    <SelectTrigger className="rounded-xl border-neutral-200">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl shadow-xl">
+                      <SelectItem value="English">English</SelectItem>
+                      <SelectItem value="Hindi">Hindi</SelectItem>
+                      <SelectItem value="Odia">Odia</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Category</Label>
+                  <Select value={formData.category || "worship"} onValueChange={(v: string | null) => setFormData({...formData, category: v || "worship"})}>
+                    <SelectTrigger className="rounded-xl border-neutral-200">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl shadow-xl">
+                      <SelectItem value="worship">Worship</SelectItem>
+                      <SelectItem value="praise">Praise</SelectItem>
+                      <SelectItem value="traditional">Traditional</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="title">Song Title</Label>
-                <Input 
-                  id="title" 
-                  value={formData.title} 
-                  onChange={e => setFormData({...formData, title: e.target.value})} 
-                  placeholder="Enter song title..."
-                  required
-                  className="rounded-xl border-neutral-200"
+                <Label htmlFor="lyrics">Lyrics</Label>
+                <Editor 
+                  content={formData.lyrics} 
+                  onChange={c => setFormData({...formData, lyrics: c})}
+                  placeholder="Type or paste lyrics here..." 
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="author">Author / Composer</Label>
-                <Input 
-                  id="author" 
-                  value={formData.author} 
-                  onChange={e => setFormData({...formData, author: e.target.value as string})} 
-                  placeholder="Unknown"
-                  className="rounded-xl border-neutral-200"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Language</Label>
-                <Select value={formData.language || "English"} onValueChange={(v: string | null) => setFormData({...formData, language: v || "English"})}>
-                  <SelectTrigger className="rounded-xl border-neutral-200">
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl shadow-xl">
-                    <SelectItem value="English">English</SelectItem>
-                    <SelectItem value="Hindi">Hindi</SelectItem>
-                    <SelectItem value="Odia">Odia</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Category</Label>
-                <Select value={formData.category || "worship"} onValueChange={(v: string | null) => setFormData({...formData, category: v || "worship"})}>
-                  <SelectTrigger className="rounded-xl border-neutral-200">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl shadow-xl">
-                    <SelectItem value="worship">Worship</SelectItem>
-                    <SelectItem value="praise">Praise</SelectItem>
-                    <SelectItem value="traditional">Traditional</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lyrics">Lyrics</Label>
-              <Editor 
-                content={formData.lyrics} 
-                onChange={c => setFormData({...formData, lyrics: c})}
-                placeholder="Type or paste lyrics here..." 
-              />
-            </div>
-            <DialogFooter className="pt-4 border-t border-neutral-100 -mx-8 px-8">
+
+            <DialogFooter className="p-8 pt-4 border-t border-neutral-100 shrink-0">
               <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting} className="rounded-xl">
                 Cancel
               </Button>
