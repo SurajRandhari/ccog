@@ -12,16 +12,17 @@ export async function GET(req: NextRequest) {
     
     const sortField = searchParams.get("sort") || "songNumber"; 
     const sortOrder = searchParams.get("order") === "desc" ? -1 : 1;
-    const lang = searchParams.get("lang") || "";
+    const lang = searchParams.get("lang") || "Hindi"; // Default to Hindi
     const category = searchParams.get("category") || "";
 
     const query: any = { status: "published" };
 
     if (lang) {
-      query.language = { $regex: new RegExp(`^${lang}$`, "i") };
+      // Use exact match for language
+      query.language = lang;
     }
 
-    if (category) {
+    if (category && category !== "All Library") {
       query.category = category;
     }
 
@@ -31,15 +32,32 @@ export async function GET(req: NextRequest) {
     } else if (sortField === "language") {
       sortOptions = { language: sortOrder, songNumber: 1 };
     } else {
-      // Default to number sorting
       sortOptions = { songNumber: sortOrder, title: 1 };
     }
 
     const songs = await Song.find(query).sort(sortOptions);
 
+    // Get counts for all categories in the current language
+    const currentLangCategories = ["Worship", "Praise", "Christmas", "Lent", "Hymn", "Special Songs", "Live"];
+    const counts: Record<string, number> = {};
+    
+    // Total for 'All Library'
+    counts["All Library"] = await Song.countDocuments({ language: lang, status: "published" });
+    
+    const categoryCounts = await Song.aggregate([
+      { $match: { language: lang, status: "published" } },
+      { $group: { _id: "$category", count: { $sum: 1 } } }
+    ]);
+
+    currentLangCategories.forEach(cat => {
+      const found = categoryCounts.find(c => c._id === cat);
+      counts[cat] = found ? found.count : 0;
+    });
+
     return NextResponse.json({
       success: true,
       data: songs,
+      counts
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });

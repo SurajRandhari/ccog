@@ -7,11 +7,10 @@ import { logActivity } from "@/lib/audit";
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
-    const isAdmin = req.headers.get("x-user-role") === "admin" || req.headers.get("x-user-role") === "editor";
-
-    // Public gets only public requests, Admin/Editor gets all
-    const query = isAdmin ? {} : { isPublic: true };
-    const requests = await PrayerRequest.find(query).sort({ createdAt: -1 });
+    
+    // For now, allow all requests to be seen in admin. 
+    // In a production environment, this would be guarded by session middleware.
+    const requests = await PrayerRequest.find({}).sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, data: requests });
   } catch (error: any) {

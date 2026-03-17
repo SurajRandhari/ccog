@@ -2,275 +2,207 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music, FileText, ExternalLink, Search, Check, ChevronDown, Zap } from "lucide-react";
+import { Search, Music, ChevronRight, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useDebounce } from "@/hooks/use-debounce";
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" as const },
-  }),
-};
+interface Song {
+  _id: string;
+  title: string;
+  slug: string;
+  songNumber: number;
+  language: string;
+  category: string;
+}
 
-const categories = ["Live", "all", "Worship", "Praise", "Christmas", "Lent", "Hymn", "Special"];
-const languages = ["all", "Hindi", "English", "Odia", "Both"];
+const LANGUAGES = ["Hindi", "English", "Odia"];
+const CATEGORIES = [
+  "All Library",
+  "Worship",
+  "Praise",
+  "Christmas",
+  "Lent",
+  "Hymn",
+  "Special Songs",
+  "Live"
+];
 
 export default function SongsPage() {
-  const [songs, setSongs] = useState([]);
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("Live");
-  const [language, setLanguage] = useState("all");
-  const [filteredSongs, setFilteredSongs] = useState([]);
+  const [activeLang, setActiveLang] = useState("Hindi");
+  const [activeCategory, setActiveCategory] = useState("All Library");
+  const debouncedSearch = useDebounce(search, 300);
+
+  // Reset category when language changes
+  useEffect(() => {
+    setActiveCategory("All Library");
+  }, [activeLang]);
 
   useEffect(() => {
-    async function fetchSongs() {
+    const fetchSongs = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/api/v1/songs");
+        const res = await fetch(`/api/songs?search=${debouncedSearch}&lang=${activeLang}&category=${activeCategory}`);
         const data = await res.json();
         if (data.success) {
           setSongs(data.data);
-          setFilteredSongs(data.data);
+          setCounts(data.counts || {});
         }
       } catch (error) {
         console.error("Failed to fetch songs");
       } finally {
         setLoading(false);
       }
-    }
+    };
+
     fetchSongs();
-  }, []);
-
-  useEffect(() => {
-    const term = search.toLowerCase();
-    const result = songs.filter((song: any) => {
-        const matchesSearch = !term || 
-            song.title.toLowerCase().includes(term) || 
-            (song.author && song.author.toLowerCase().includes(term)) ||
-            (song.lyrics && song.lyrics.toLowerCase().includes(term));
-        
-        let matchesCategory = false;
-        if (category === "Live") {
-            matchesCategory = song.isLive === true;
-        } else {
-            matchesCategory = category === "all" || song.category === category;
-        }
-
-        const matchesLanguage = language === "all" || song.language === language;
-        
-        return matchesSearch && matchesCategory && matchesLanguage;
-    });
-    setFilteredSongs(result);
-  }, [search, category, language, songs]);
+  }, [debouncedSearch, activeLang, activeCategory]);
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen bg-[#fafafa] selection:bg-neutral-900 selection:text-white">
       {/* Header Section */}
-      <section className="relative overflow-hidden pt-32 pb-20 lg:pt-48 lg:pb-32">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,0,0,0.03)_0%,transparent_50%)]" />
-        </div>
-        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 text-center">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            custom={0}
-            variants={fadeInUp}
-            className="mx-auto max-w-3xl"
-          >
-            <span className="inline-flex items-center rounded-full bg-neutral-100 px-4 py-1.5 text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-8 border border-neutral-200/50">
-              Multilingual Hymnbook
-            </span>
-            <h1 className="font-serif text-6xl font-semibold tracking-tight text-neutral-900 sm:text-8xl mb-8">
-              Song Book
-            </h1>
-            <p className="text-xl leading-relaxed text-neutral-500 font-light max-w-2xl mx-auto">
-              A curated collection of spiritual songs in Hindi, English, and Odia for worship and reflection.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Main Content */}
-      <section className="bg-neutral-50/30 border-t border-neutral-100 py-12 lg:py-20 min-h-[600px]">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="flex flex-col gap-12">
-            
-            {/* Search & Filters Controls */}
-            <div className="space-y-10">
-                {/* Glassmorphic Search Bar */}
-                <div className="relative max-w-2xl mx-auto">
-                    <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400 z-10" />
-                    <Input
-                        placeholder="Search by title, lyrics or composer..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="h-16 border-neutral-200/60 bg-white/70 backdrop-blur-xl pl-14 pr-6 rounded-3xl shadow-xl shadow-neutral-200/30 focus-visible:ring-neutral-900 transition-all text-lg font-light"
-                    />
-                </div>
-
-                {/* Unified Filter Row */}
-                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between bg-white/50 backdrop-blur-sm p-4 rounded-[2.5rem] border border-neutral-100 shadow-sm">
-                    {/* Categories Chips */}
-                    <div className="flex flex-wrap gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
-                        {categories.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => setCategory(cat)}
-                                className={cn(
-                                    "flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all border shrink-0",
-                                    cat === "Live" && category !== "Live" && "border-amber-200 text-amber-700 bg-amber-50/50",
-                                    category === cat 
-                                        ? "bg-neutral-900 text-white border-neutral-900 shadow-lg shadow-neutral-200" 
-                                        : "bg-white text-neutral-500 border-neutral-200 hover:border-neutral-400"
-                                )}
-                            >
-                                {cat === "Live" && <Zap className={cn("h-3 w-3", category === "Live" ? "text-amber-400" : "text-amber-500")} />}
-                                {cat === "all" ? "All Library" : cat === "Special" ? "Special Songs" : cat}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Language Dropdown */}
-                    <div className="shrink-0 w-full lg:w-48">
-                        <Select value={language} onValueChange={(val: string | null) => {
-                            if (val) setLanguage(val);
-                        }}>
-                            <SelectTrigger className="h-11 rounded-full border-neutral-200 bg-white px-6 text-xs font-semibold tracking-wide text-neutral-600 focus:ring-neutral-900">
-                                <div className="flex items-center gap-2">
-                                    <SelectValue placeholder="Language" />
-                                </div>
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl border-neutral-100 shadow-xl overflow-hidden p-1">
-                                {languages.map((lang) => (
-                                    <SelectItem 
-                                        key={lang} 
-                                        value={lang}
-                                        className="rounded-xl text-xs font-medium py-2.5"
-                                    >
-                                        {lang === "all" ? "All Languages" : lang === "Both" ? "Bilingual" : lang}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
+      <section className="relative pt-32 pb-4 px-6 bg-white border-b border-neutral-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mb-16">
+            <div className="space-y-4">
+              <Badge variant="outline" className="rounded-full px-4 py-1 text-[10px] uppercase font-bold tracking-[0.2em] border-neutral-200 text-neutral-400">
+                Resource Center
+              </Badge>
+              <h1 className="text-5xl md:text-7xl font-semibold tracking-tight leading-tight text-neutral-900">
+                The <span className="font-serif italic font-light">Hymnal</span>
+              </h1>
+              <p className="text-xl text-neutral-500 max-w-lg font-light leading-relaxed">
+                A unified library of spiritual songs in Hindi, English, and Odia.
+              </p>
             </div>
 
-            {/* Content Grid */}
-            <div className="mt-4">
-                {loading ? (
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        {[1,2,3,4,5,6].map(i => (
-                            <div key={i} className="h-64 rounded-[3rem] bg-white border border-neutral-100 animate-pulse" />
-                        ))}
-                    </div>
-                ) : filteredSongs.length === 0 ? (
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="py-32 text-center"
+            <div className="relative w-full md:w-[400px]">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+              <Input 
+                placeholder="Search collection..." 
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-16 pl-14 rounded-[2rem] border-neutral-100 bg-neutral-50 focus:bg-white transition-all shadow-sm focus:ring-0 text-lg font-light"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            {/* 1st Level: Language Tabs */}
+            <div className="flex items-center gap-1 p-1 bg-neutral-100 rounded-2xl w-fit">
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => setActiveLang(lang)}
+                  className={cn(
+                    "relative px-10 py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-300",
+                    activeLang === lang 
+                      ? "text-neutral-900" 
+                      : "text-neutral-500 hover:text-neutral-700"
+                  )}
+                >
+                  {activeLang === lang && (
+                    <motion.div
+                      layoutId="activeLang"
+                      className="absolute inset-0 bg-white shadow-sm rounded-xl"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10">{lang}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* 2nd Level: Category Filter (Scrollable) */}
+            <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+                {CATEGORIES.map((cat) => (
+                    <button
+                        key={cat}
+                        onClick={() => setActiveCategory(cat)}
+                        className={cn(
+                            "group flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold tracking-wider transition-all border shrink-0",
+                            activeCategory === cat 
+                                ? "bg-neutral-900 text-white border-neutral-900 shadow-xl shadow-neutral-200" 
+                                : "bg-white text-neutral-400 border-neutral-100 hover:border-neutral-300 hover:text-neutral-600"
+                        )}
                     >
-                        <div className="h-20 w-20 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6 text-neutral-300">
-                            <Music className="h-10 w-10" />
-                        </div>
-                        <h3 className="text-xl font-medium text-neutral-900 mb-2 font-serif">
-                            {category === "Live" ? "No songs in current set" : "No songs found"}
-                        </h3>
-                        <p className="text-neutral-500 font-light">
-                            {category === "Live" 
-                                ? "Songs for today's session haven't been selected yet." 
-                                : "Try adjusting your filters or search term."}
-                        </p>
-                        <button 
-                            onClick={() => {setSearch(""); setCategory("all"); setLanguage("all")}}
-                            className="mt-8 text-sm font-semibold text-neutral-900 underline underline-offset-4"
-                        >
-                            Explore full library
-                        </button>
-                    </motion.div>
-                ) : (
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                        <AnimatePresence mode="popLayout">
-                            {filteredSongs.map((song: any, i) => (
-                                <motion.div
-                                    key={song._id}
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    <Link
-                                        href={`/resources/songs/${song.slug}`}
-                                        className="group relative flex flex-col justify-between h-72 rounded-[3.5rem] border border-neutral-100 bg-white p-10 shadow-sm transition-all hover:shadow-2xl hover:shadow-neutral-200/50 hover:-translate-y-2 overflow-hidden"
-                                    >
-                                        {song.isLive && (
-                                            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 px-3 py-1 bg-amber-100 text-amber-700 text-[8px] font-bold uppercase tracking-widest rounded-full border border-amber-200 shadow-sm shadow-amber-100 flex items-center gap-1 animate-pulse">
-                                                <Zap className="h-2 w-2 fill-current" />
-                                                Live Set
-                                            </div>
-                                        )}
-
-                                        <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
-                                            <Music className="h-32 w-32" />
-                                        </div>
-                                        
-                                        <div>
-                                            <div className="flex items-start justify-between">
-                                                <div className="h-14 w-14 flex items-center justify-center rounded-2xl bg-neutral-50 text-neutral-300 group-hover:bg-neutral-900 group-hover:text-white transition-all transform group-hover:rotate-12 duration-500">
-                                                    <Music className="h-7 w-7" />
-                                                </div>
-                                                {song.songNumber && (
-                                                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.2em] px-4 py-1.5 rounded-full bg-neutral-50 border border-neutral-100">
-                                                        #{song.songNumber}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <h4 className="mt-8 text-2xl font-semibold text-neutral-900 group-hover:text-neutral-700 line-clamp-2 leading-tight font-serif tracking-tight">
-                                                {song.title}
-                                            </h4>
-                                            <p className="mt-3 text-sm text-neutral-400 line-clamp-1 font-light italic">
-                                                {song.author || "Calvary Hymnal"}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex items-center justify-between pt-8 border-t border-neutral-50/50">
-                                            <div className="flex gap-2">
-                                                <span className="px-3 py-1 rounded-full bg-neutral-100/50 text-[9px] font-bold text-neutral-500 uppercase tracking-wider">
-                                                    {song.language === "Both" ? "Bilingual" : song.language}
-                                                </span>
-                                                <span className="px-3 py-1 rounded-full bg-neutral-900/5 text-[9px] font-bold text-neutral-700 uppercase tracking-wider">
-                                                    {song.category}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-neutral-900 uppercase tracking-[0.1em] opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0">
-                                                Read
-                                                <ExternalLink className="h-3.5 w-3.5" />
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
-                    </div>
-                )}
+                        {cat === "Live" && <Zap className={cn("h-3 w-3", activeCategory === "Live" ? "text-amber-400" : "text-amber-500 group-hover:text-amber-600")} />}
+                        {cat}
+                        <span className={cn(
+                            "px-1.5 py-0.5 rounded-md text-[9px] font-bold",
+                            activeCategory === cat ? "bg-white/10 text-white/50" : "bg-neutral-50 text-neutral-300"
+                        )}>
+                            {counts[cat] || 0}
+                        </span>
+                    </button>
+                ))}
             </div>
           </div>
         </div>
       </section>
+
+      {/* Songs List */}
+      <main className="max-w-7xl mx-auto px-6 py-16">
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-24 rounded-[2rem] bg-neutral-100 animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AnimatePresence mode="popLayout">
+              {songs.length > 0 ? (
+                songs.map((song, i) => (
+                  <motion.div
+                    key={song._id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.4, delay: i * 0.02, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <Link 
+                      href={`/resources/songs/${song.slug}`}
+                      className="group flex items-center gap-6 p-6 rounded-[2rem] bg-white hover:shadow-2xl hover:shadow-neutral-200/50 transition-all border border-neutral-100/50 hover:border-neutral-200 hover:-translate-y-0.5"
+                    >
+                      <div className="w-16 h-16 rounded-2xl bg-neutral-50 flex items-center justify-center font-mono text-xl font-bold text-neutral-200 group-hover:text-neutral-900 transition-colors border border-neutral-100/50">
+                        {song.songNumber?.toString().padStart(3, "0")}
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <h3 className="text-xl font-medium tracking-tight text-neutral-800">
+                            {song.title}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-neutral-300 uppercase tracking-widest">{song.category}</span>
+                            <span className="w-1 h-1 rounded-full bg-neutral-100" />
+                            <span className="text-[10px] font-bold text-neutral-300 uppercase tracking-widest">{song.language}</span>
+                        </div>
+                      </div>
+                      <ChevronRight className="ml-auto h-5 w-5 text-neutral-200 group-hover:text-neutral-900 group-hover:translate-x-1 transition-all" />
+                    </Link>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full flex flex-col items-center justify-center py-40 text-center">
+                  <div className="w-24 h-24 rounded-[2.5rem] bg-neutral-50 flex items-center justify-center mb-8">
+                    <Music className="h-10 w-10 text-neutral-200" />
+                  </div>
+                  <h2 className="text-3xl font-semibold text-neutral-900 mb-2">No Songs Found</h2>
+                  <p className="text-lg text-neutral-500 font-light max-w-sm">
+                    We couldn't find any songs matching <span className="font-semibold text-neutral-900">{activeCategory}</span> in <span className="font-semibold text-neutral-900">{activeLang}</span>.
+                  </p>
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

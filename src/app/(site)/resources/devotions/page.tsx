@@ -1,8 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { BookOpen, Calendar, User, ArrowRight } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BookOpen, Calendar, User, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -13,38 +15,38 @@ const fadeInUp = {
   }),
 };
 
-// Dummy data for devotions
-const devotions = [
-  {
-    id: "1",
-    title: "Finding Peace in the Storm",
-    excerpt: "When the winds of life howl and the waves crash against your soul, remember the one who speaks to the storm...",
-    author: "Rev. Suresh Randhari",
-    date: "May 20, 2026",
-  },
-  {
-    id: "2",
-    title: "The Strength of Weakness",
-    excerpt: "It is in our moments of greatest vulnerability that God's power is most perfectly displayed. Let us lean into His grace...",
-    author: "Rev. Suresh Randhari",
-    date: "May 19, 2026",
-  },
-  {
-    id: "3",
-    title: "Walking by Faith, Not by Sight",
-    excerpt: "Our eyes often deceive us, focusing on the obstacles rather than the objective. Faith is the lens that reveals God's plan...",
-    author: "Rev. Suresh Randhari",
-    date: "May 18, 2026",
-  },
-];
-
 export default function DevotionsPage() {
+  const [devotions, setDevotions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchDevotions = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/devotions?page=${page}&limit=6`);
+      const data = await res.json();
+      if (data.success) {
+        setDevotions(data.data);
+        setTotalPages(data.pagination.pages);
+      }
+    } catch (error) {
+      console.error("Failed to fetch devotions");
+    } finally {
+      setLoading(false);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    fetchDevotions();
+  }, [fetchDevotions]);
+
   return (
-    <div className="bg-white">
+    <div className="bg-white min-h-screen">
       {/* Header */}
-      <section className="relative overflow-hidden py-24 lg:py-32">
+      <section className="relative overflow-hidden pt-32 pb-16 lg:pt-48 lg:pb-24">
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,0,0,0.05)_0%,transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,0,0,0.03)_0%,transparent_50%)]" />
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
@@ -54,10 +56,13 @@ export default function DevotionsPage() {
             variants={fadeInUp}
             className="mx-auto max-w-2xl text-center"
           >
-            <h1 className="font-serif text-4xl font-semibold tracking-tight text-neutral-900 sm:text-6xl">
-              Daily Devotions
+            <span className="inline-flex items-center rounded-full bg-neutral-100 px-4 py-1.5 text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-8 border border-neutral-200/50">
+              Spiritual Nutrition
+            </span>
+            <h1 className="font-serif text-5xl font-semibold tracking-tight text-neutral-900 sm:text-7xl mb-6">
+              Daily <span className="italic font-light">Devotions</span>
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-neutral-500">
+            <p className="text-xl leading-relaxed text-neutral-500 font-light max-w-xl mx-auto">
               Pause for a moment each day to reflect on God's Word and find strength for your journey.
             </p>
           </motion.div>
@@ -65,59 +70,83 @@ export default function DevotionsPage() {
       </section>
 
       {/* Devotions List */}
-      <section className="bg-neutral-50 py-24 lg:py-32">
+      <section className="bg-neutral-50/50 border-t border-neutral-100 py-24 lg:py-32 min-h-[600px]">
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
-          <div className="space-y-12">
-            {devotions.map((devotion, i) => (
-              <motion.article
-                key={devotion.id}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-                variants={fadeInUp}
-                className="group relative rounded-[2rem] border border-neutral-200 bg-white p-8 transition-all hover:border-neutral-300 hover:shadow-xl hover:shadow-neutral-200 lg:p-12"
-              >
-                <div className="flex items-center gap-4 text-sm text-neutral-400">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="h-4 w-4" />
-                    {devotion.date}
-                  </span>
-                  <span className="h-1 w-1 rounded-full bg-neutral-300" />
-                  <span className="flex items-center gap-1.5">
-                    <User className="h-4 w-4" />
-                    {devotion.author}
-                  </span>
-                </div>
-                <h2 className="mt-6 font-serif text-2xl font-semibold text-neutral-900 lg:text-3xl">
-                  {devotion.title}
-                </h2>
-                <p className="mt-4 text-lg leading-relaxed text-neutral-600">
-                  {devotion.excerpt}
-                </p>
-                <Link
-                  href={`/resources/devotions/${devotion.id}`}
-                  className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-neutral-900 transition-colors hover:text-neutral-600"
-                >
-                  Read full devotion
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </motion.article>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-neutral-300" />
+            </div>
+          ) : (
+            <div className="space-y-12">
+              <AnimatePresence mode="popLayout">
+                {devotions.length > 0 ? (
+                    devotions.map((devotion, i) => (
+                    <motion.article
+                        key={devotion._id}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        custom={i % 6}
+                        variants={fadeInUp}
+                        className="group relative rounded-[2.5rem] border border-neutral-200/60 bg-white p-10 transition-all hover:border-neutral-300 hover:shadow-2xl hover:shadow-neutral-200/50 lg:p-14"
+                    >
+                        <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-neutral-400">
+                        <span className="flex items-center gap-1.5 bg-neutral-50 px-3 py-1.5 rounded-full border border-neutral-100">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(devotion.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                            <User className="h-3 w-3 text-neutral-300" />
+                            {devotion.author}
+                        </span>
+                        </div>
+                        <h2 className="mt-8 font-serif text-3xl font-semibold text-neutral-900 lg:text-4xl group-hover:text-neutral-700 transition-colors">
+                        {devotion.title}
+                        </h2>
+                        <div className="mt-6 text-lg leading-relaxed text-neutral-500 font-light line-clamp-3 italic">
+                        {devotion.scripture}
+                        </div>
+                        <Link
+                        href={`/resources/devotions/${devotion.slug}`}
+                        className="mt-10 inline-flex items-center gap-2 text-sm font-bold text-neutral-900 group-hover:underline underline-offset-8"
+                        >
+                        READ FULL DEVOTION
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-2" />
+                        </Link>
+                    </motion.article>
+                    ))
+                ) : (
+                    <div className="text-center py-32">
+                        <p className="text-neutral-400">No devotions have been published yet.</p>
+                    </div>
+                )}
+              </AnimatePresence>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            custom={4}
-            variants={fadeInUp}
-            className="mt-16 text-center"
-          >
-            <p className="text-sm text-neutral-400">
-              More devotions are available in our archive.
-            </p>
-          </motion.div>
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-4 pt-12">
+                  <Button 
+                    variant="ghost" 
+                    disabled={page === 1}
+                    onClick={() => setPage(p => p - 1)}
+                    className="rounded-full px-6"
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm font-bold text-neutral-900">
+                    {page} / {totalPages}
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    disabled={page === totalPages}
+                    onClick={() => setPage(p => p + 1)}
+                    className="rounded-full px-6"
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
     </div>
