@@ -5,7 +5,8 @@ export interface ISermon extends Document {
   slug: string;
   speaker: string;
   description: string;
-  videoUrl: string;
+  content?: string;
+  videoUrl?: string;
   date: Date;
   tags: string[];
   status: "draft" | "published";
@@ -20,7 +21,8 @@ const sermonSchema = new Schema<ISermon>(
     slug: { type: String, unique: true, trim: true },
     speaker: { type: String, required: true, trim: true },
     description: { type: String, required: true },
-    videoUrl: { type: String, required: true },
+    content: { type: String, required: false },
+    videoUrl: { type: String, required: false },
     date: { type: Date, default: Date.now },
     tags: [{ type: String, trim: true }],
     status: {
@@ -41,7 +43,11 @@ sermonSchema.index({ status: 1, publishedAt: -1 });
 sermonSchema.index({ series: 1 });
 sermonSchema.index({ tags: 1 });
 
-const Sermon: Model<ISermon> =
-  mongoose.models.Sermon || mongoose.model<ISermon>("Sermon", sermonSchema);
+// Clear model to ensure schema changes are picked up during hot-reloads
+if (mongoose.models.Sermon) {
+  delete (mongoose as any).models.Sermon;
+}
+
+const Sermon: Model<ISermon> = mongoose.model<ISermon>("Sermon", sermonSchema);
 
 export default Sermon;

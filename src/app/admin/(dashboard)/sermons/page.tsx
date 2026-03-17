@@ -41,6 +41,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import Link from "next/link";
+import Editor from "@/components/admin/Editor";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -66,6 +67,7 @@ export default function SermonsAdminPage() {
     title: "",
     speaker: "Rev. Suresh Randhari",
     description: "",
+    content: "",
     videoUrl: "",
     date: new Date().toISOString().split('T')[0],
     tags: ""
@@ -100,6 +102,7 @@ export default function SermonsAdminPage() {
       title: "",
       speaker: "Rev. Suresh Randhari",
       description: "",
+      content: "",
       videoUrl: "",
       date: new Date().toISOString().split('T')[0],
       tags: ""
@@ -113,7 +116,8 @@ export default function SermonsAdminPage() {
       title: sermon.title,
       speaker: sermon.speaker,
       description: sermon.description,
-      videoUrl: sermon.videoUrl,
+      content: sermon.content || "",
+      videoUrl: sermon.videoUrl || "",
       date: new Date(sermon.date).toISOString().split('T')[0],
       tags: sermon.tags?.join(", ") || ""
     });
@@ -221,18 +225,24 @@ export default function SermonsAdminPage() {
               >
                 <Card className="group overflow-hidden border-neutral-200 bg-white hover:shadow-xl transition-all h-full flex flex-col">
                   <div className="relative aspect-video bg-neutral-900 overflow-hidden">
-                    <img 
-                      src={`https://img.youtube.com/vi/${sermon.videoUrl.split('v=')[1]?.split('&')[0] || sermon.videoUrl.split('/').pop()}/maxresdefault.jpg`} 
-                      alt={sermon.title}
-                      className="h-full w-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500"
-                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=800'; }}
-                    />
+                    {sermon.videoUrl ? (
+                      <img 
+                        src={`https://img.youtube.com/vi/${sermon.videoUrl.split('v=')[1]?.split('&')[0] || sermon.videoUrl.split('/').pop()}/maxresdefault.jpg`} 
+                        alt={sermon.title}
+                        className="h-full w-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-500"
+                        onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=800'; }}
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center bg-neutral-100 text-neutral-400">
+                        <Info className="h-12 w-12" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pt-10" />
                     <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
                       <Badge className="bg-neutral-900/50 backdrop-blur-md border-none text-[10px]">
                         {sermon.tags?.[0] || 'Sermon'}
                       </Badge>
-                      <Youtube className="h-5 w-5 text-red-600" />
+                      {sermon.videoUrl && <Youtube className="h-5 w-5 text-red-600" />}
                     </div>
                   </div>
                   <CardHeader className="p-5 pb-2">
@@ -272,9 +282,9 @@ export default function SermonsAdminPage() {
                     </div>
                   </CardContent>
                   <CardFooter className="p-5 pt-0 border-t border-neutral-50 mt-auto bg-neutral-50/30">
-                    <Link href={sermon.videoUrl} target="_blank" className="w-full">
+                    <Link href={sermon.videoUrl ? `/resources/sermons/${sermon.slug}` : `/resources/sermons/${sermon.slug}`} className="w-full">
                       <Button variant="ghost" className="w-full justify-between group/btn text-xs font-semibold text-neutral-600 hover:text-neutral-900">
-                        Watch Sermon
+                        {sermon.videoUrl ? 'Watch Sermon' : 'Read Message'}
                         <ChevronRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
                       </Button>
                     </Link>
@@ -317,90 +327,102 @@ export default function SermonsAdminPage() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[650px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
-          <DialogHeader className="p-8 pb-0">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] md:max-h-[85vh] rounded-3xl p-0 overflow-hidden border-none shadow-2xl flex flex-col bg-white">
+          <DialogHeader className="p-8 pb-4 flex-shrink-0">
             <DialogTitle className="font-serif text-2xl">{editingSermon ? "Edit Sermon" : "Upload New Sermon"}</DialogTitle>
-            <DialogDescription>Enter sermon details and YouTube link to publish.</DialogDescription>
+            <DialogDescription>Enter sermon details, video link, or full text content.</DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="p-8 space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
+          
+          <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-8 pt-0 space-y-6 custom-scrollbar">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Sermon Title</Label>
+                  <Input 
+                    id="title" 
+                    value={formData.title} 
+                    onChange={e => setFormData({...formData, title: e.target.value})} 
+                    placeholder="e.g. The Power of Grace"
+                    required
+                    className="rounded-xl border-neutral-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="speaker">Speaker</Label>
+                  <Input 
+                    id="speaker" 
+                    value={formData.speaker} 
+                    onChange={e => setFormData({...formData, speaker: e.target.value})} 
+                    placeholder="Speaker name..."
+                    required
+                    className="rounded-xl border-neutral-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="date">Preach Date</Label>
+                  <Input 
+                    id="date" 
+                    type="date"
+                    value={formData.date} 
+                    onChange={e => setFormData({...formData, date: e.target.value})} 
+                    required
+                    className="rounded-xl border-neutral-200"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="videoUrl">YouTube URL (Optional)</Label>
+                  <Input 
+                    id="videoUrl" 
+                    value={formData.videoUrl} 
+                    onChange={e => setFormData({...formData, videoUrl: e.target.value})} 
+                    placeholder="https://youtube.com/watch?v=..."
+                    className="rounded-xl border-neutral-200"
+                  />
+                </div>
+              </div>
+              
               <div className="space-y-2">
-                <Label htmlFor="title">Sermon Title</Label>
+                <Label>Full Sermon Content (Text Version)</Label>
+                <Editor 
+                  content={formData.content} 
+                  onChange={val => setFormData({ ...formData, content: val })} 
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tags">Tags (comma separated)</Label>
                 <Input 
-                  id="title" 
-                  value={formData.title} 
-                  onChange={e => setFormData({...formData, title: e.target.value})} 
-                  placeholder="e.g. The Power of Grace"
-                  required
+                  id="tags" 
+                  value={formData.tags} 
+                  onChange={e => setFormData({...formData, tags: e.target.value})} 
+                  placeholder="Faith, Hope, SeriesName"
                   className="rounded-xl border-neutral-200"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="speaker">Speaker</Label>
-                <Input 
-                  id="speaker" 
-                  value={formData.speaker} 
-                  onChange={e => setFormData({...formData, speaker: e.target.value})} 
-                  placeholder="Speaker name..."
+                <Label htmlFor="description">Message Description</Label>
+                <Textarea 
+                  id="description" 
+                  value={formData.description} 
+                  onChange={e => setFormData({...formData, description: e.target.value})} 
+                  rows={4}
+                  placeholder="Brief summary of the message..."
+                  className="rounded-2xl border-neutral-200 resize-none"
                   required
-                  className="rounded-xl border-neutral-200"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="date">Preach Date</Label>
-                <Input 
-                  id="date" 
-                  type="date"
-                  value={formData.date} 
-                  onChange={e => setFormData({...formData, date: e.target.value})} 
-                  required
-                  className="rounded-xl border-neutral-200"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="videoUrl">YouTube URL</Label>
-                <Input 
-                  id="videoUrl" 
-                  value={formData.videoUrl} 
-                  onChange={e => setFormData({...formData, videoUrl: e.target.value})} 
-                  placeholder="https://youtube.com/watch?v=..."
-                  required
-                  className="rounded-xl border-neutral-200"
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="tags">Tags (comma separated)</Label>
-              <Input 
-                id="tags" 
-                value={formData.tags} 
-                onChange={e => setFormData({...formData, tags: e.target.value})} 
-                placeholder="Faith, Hope, SeriesName"
-                className="rounded-xl border-neutral-200"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Message Description</Label>
-              <Textarea 
-                id="description" 
-                value={formData.description} 
-                onChange={e => setFormData({...formData, description: e.target.value})} 
-                rows={4}
-                placeholder="Brief summary of the message..."
-                className="rounded-2xl border-neutral-200 resize-none"
-                required
-              />
-            </div>
-            <DialogFooter className="pt-4 border-t border-neutral-100 -mx-8 px-8 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-neutral-400">
+
+            <DialogFooter className="p-8 py-6 border-t border-neutral-100 flex-shrink-0 flex items-center justify-between bg-neutral-50/50">
+              <div className="hidden sm:flex items-center gap-2 text-xs text-neutral-400">
                 <Info className="h-3 w-3" />
                 Slug will be auto-generated
               </div>
-              <div className="flex gap-2">
-                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting} className="rounded-xl">
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} disabled={isSubmitting} className="rounded-xl flex-1 sm:flex-none">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting} className="rounded-xl bg-neutral-900 px-8">
+                <Button type="submit" disabled={isSubmitting} className="rounded-xl bg-neutral-900 px-8 flex-1 sm:flex-none">
                   {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                   {editingSermon ? "Update Archive" : "Publish Sermon"}
                 </Button>

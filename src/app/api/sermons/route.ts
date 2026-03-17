@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import Sermon from "@/models/Sermon";
 import slugify from "slugify";
 import { logActivity } from "@/lib/audit";
+import { revalidatePath } from "next/cache";
 
 // GET /api/sermons - List all sermons
 export async function GET(req: NextRequest) {
@@ -42,15 +43,25 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
     
-    if (!body.title || !body.videoUrl) {
-      return NextResponse.json({ success: false, message: "Title and videoUrl are required" }, { status: 400 });
+    if (!body.title) {
+      return NextResponse.json({ success: false, message: "Title is required" }, { status: 400 });
+    }
+
+    if (!body.videoUrl && !body.content) {
+      return NextResponse.json({ success: false, message: "Either video URL or text content is required" }, { status: 400 });
     }
 
     const slug = slugify(body.title, { lower: true, strict: true });
+    
+    // Ensure createdBy is a valid string ID
+    const createdBy = (typeof adminId === 'string' && adminId.length === 24) 
+      ? adminId 
+      : "60d5f9b4f1b2c34d5e6f7a8b";
+
     const sermon = await Sermon.create({
       ...body,
       slug,
-      createdBy: adminId || "60d5f9b4f1b2c34d5e6f7a8b"
+      createdBy
     });
 
     // Log Activity
@@ -64,6 +75,8 @@ export async function POST(req: NextRequest) {
         details: `Created sermon: ${sermon.title}`,
       });
     }
+
+    revalidatePath("/resources/sermons");
 
     return NextResponse.json({ success: true, data: sermon }, { status: 201 });
   } catch (error: any) {

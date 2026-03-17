@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Sermon from "@/models/Sermon";
+import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { logActivity } from "@/lib/audit";
 
@@ -14,6 +15,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!sermon) {
       return NextResponse.json({ success: false, message: "Sermon not found" }, { status: 404 });
     }
+
+    revalidatePath("/resources/sermons");
+    revalidatePath(`/resources/sermons/${sermon.slug}`);
 
     return NextResponse.json({ success: true, data: sermon });
   } catch (error: any) {
