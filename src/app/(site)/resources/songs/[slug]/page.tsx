@@ -5,9 +5,10 @@ import dbConnect from "@/lib/mongodb";
 import Song from "@/models/Song";
 import { notFound } from "next/navigation";
 
-export default async function SongDetailsPage({ params }: { params: { slug: string } }) {
+export default async function SongDetailsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   await dbConnect();
-  const song = await Song.findOne({ slug: params.slug, status: "published" });
+  const song = await Song.findOne({ slug: slug, status: "published" });
 
   if (!song) {
       notFound();
@@ -54,12 +55,6 @@ export default async function SongDetailsPage({ params }: { params: { slug: stri
             </h1>
             
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-500">
-                {song.author && (
-                    <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-neutral-300" />
-                        <span className="font-medium text-neutral-700">{song.author}</span>
-                    </div>
-                )}
                 <div className="flex items-center gap-2">
                     <Tag className="h-4 w-4 text-neutral-300" />
                     <span className="font-medium text-neutral-700">{song.category}</span>

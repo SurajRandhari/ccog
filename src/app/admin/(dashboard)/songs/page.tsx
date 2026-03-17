@@ -71,37 +71,37 @@ export default function SongsAdminPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSong, setEditingSong] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sort, setSort] = useState("songNumber");
+  const [order, setOrder] = useState("asc");
+
   const [formData, setFormData] = useState<{
     title: string;
     lyrics: string;
     language: string;
     category: string;
-    author: string;
     status: string;
   }>({
     title: "",
     lyrics: "",
     language: "English",
     category: "worship",
-    author: "Unknown",
     status: "published"
   });
 
   const fetchSongs = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/songs?page=${page}&limit=10&search=${search}`);
+      const res = await fetch(`/api/songs?search=${search}&sort=${sort}&order=${order}`);
       const data = await res.json();
       if (data.success) {
         setSongs(data.data);
-        setTotalPages(data.pagination.pages);
       }
     } catch (error) {
       toast.error("Failed to fetch songs");
     } finally {
       setLoading(false);
     }
-  }, [page, search]);
+  }, [search, sort, order]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -117,7 +117,6 @@ export default function SongsAdminPage() {
       lyrics: "",
       language: "English",
       category: "worship",
-      author: "Unknown",
       status: "published"
     });
     setIsDialogOpen(true);
@@ -130,7 +129,6 @@ export default function SongsAdminPage() {
       lyrics: song.lyrics,
       language: song.language,
       category: song.category,
-      author: song.author || "Unknown",
       status: song.status
     });
     setIsDialogOpen(true);
@@ -218,23 +216,47 @@ export default function SongsAdminPage() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-neutral-100 bg-neutral-50/50 text-neutral-400 uppercase tracking-wider font-medium">
               <tr>
-                <th className="px-6 py-4 italic">Title</th>
-                <th className="px-6 py-4">Language</th>
+                <th 
+                  className="px-6 py-4 italic w-20 cursor-pointer hover:text-neutral-900 transition-colors"
+                  onClick={() => {
+                    setSort("songNumber");
+                    setOrder(order === "asc" ? "desc" : "asc");
+                  }}
+                >
+                  # {sort === "songNumber" && (order === "asc" ? "↑" : "↓")}
+                </th>
+                <th 
+                  className="px-6 py-4 cursor-pointer hover:text-neutral-900 transition-colors"
+                  onClick={() => {
+                    setSort("title");
+                    setOrder(order === "asc" ? "desc" : "asc");
+                  }}
+                >
+                  Title {sort === "title" && (order === "asc" ? "↑" : "↓")}
+                </th>
+                <th 
+                  className="px-6 py-4 cursor-pointer hover:text-neutral-900 transition-colors"
+                  onClick={() => {
+                    setSort("language");
+                    setOrder(order === "asc" ? "desc" : "asc");
+                  }}
+                >
+                  Language {sort === "language" && (order === "asc" ? "↑" : "↓")}
+                </th>
                 <th className="px-6 py-4">Category</th>
-                <th className="px-6 py-4">Author</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center">
+                  <td colSpan={6} className="px-6 py-12 text-center">
                     <Loader2 className="mx-auto h-6 w-6 animate-spin text-neutral-400" />
                   </td>
                 </tr>
               ) : songs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-neutral-400">
+                  <td colSpan={6} className="px-6 py-12 text-center text-neutral-400">
                     No songs found matching your search.
                   </td>
                 </tr>
@@ -249,8 +271,13 @@ export default function SongsAdminPage() {
                     className="group hover:bg-neutral-50/50 transition-colors"
                   >
                     <td className="px-6 py-4">
+                      <span className="font-mono text-neutral-400 font-bold tracking-wider">
+                        #{song.songNumber?.toString().padStart(3, "0")}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                        <div className="h-9 w-9 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-500 group-hover:bg-neutral-900 group-hover:text-white transition-all">
                           <Music className="h-4 w-4" />
                         </div>
                         <span className="font-semibold text-neutral-900">{song.title}</span>
@@ -264,9 +291,6 @@ export default function SongsAdminPage() {
                     </td>
                     <td className="px-6 py-4 text-neutral-600 capitalize">
                       {song.category}
-                    </td>
-                    <td className="px-6 py-4 text-neutral-500">
-                      {song.author || "Unknown"}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <DropdownMenu>
@@ -340,16 +364,6 @@ export default function SongsAdminPage() {
                     onChange={e => setFormData({...formData, title: e.target.value})} 
                     placeholder="Enter song title..."
                     required
-                    className="rounded-xl border-neutral-200"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="author">Author / Composer</Label>
-                  <Input 
-                    id="author" 
-                    value={formData.author} 
-                    onChange={e => setFormData({...formData, author: e.target.value as string})} 
-                    placeholder="Unknown"
                     className="rounded-xl border-neutral-200"
                   />
                 </div>

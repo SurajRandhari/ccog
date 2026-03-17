@@ -41,10 +41,9 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
     songNumber: initialData?.songNumber || "",
-    author: initialData?.author || "",
     lyrics: initialData?.lyrics || "",
-    category: initialData?.category || "Worship",
-    language: initialData?.language || "Hindi",
+    category: initialData?.category || "hymn",
+    language: initialData?.language || "English",
     tags: initialData?.tags || [],
     status: initialData?.status || "published",
     isLive: initialData?.isLive || false,
@@ -57,26 +56,32 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
     try {
       setLoading(true);
       const url = isEditing 
-        ? `/api/v1/admin/songs/${initialData._id}` 
-        : "/api/v1/admin/songs";
+        ? `/api/songs/${initialData._id}` 
+        : "/api/songs";
       const method = isEditing ? "PUT" : "POST";
+
+      // Ensure songNumber is a number
+      const payload = {
+        ...formData,
+        songNumber: formData.songNumber ? Number(formData.songNumber) : null
+      };
 
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
       if (data.success) {
-        toast.success(isEditing ? "Song updated" : "Song created");
+        toast.success(isEditing ? "Song updated successfully" : "Song created successfully");
         router.push("/admin/songs");
         router.refresh();
       } else {
-        toast.error(data.error.message);
+        toast.error(data.message || "Failed to save song");
       }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error("An error occurred while saving");
     } finally {
       setLoading(false);
     }
@@ -95,204 +100,170 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 pb-20">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between px-6 lg:px-0">
         <div className="flex items-center gap-4">
           <Button
             type="button"
             variant="ghost"
             size="icon"
             onClick={() => router.back()}
-            className="rounded-full"
+            className="rounded-full h-10 w-10 border border-neutral-100 bg-white"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="font-serif text-3xl font-bold text-neutral-900">
-              {isEditing ? "Edit Song" : "Add New Song"}
+            <h1 className="font-serif text-3xl font-bold text-neutral-900 leading-tight">
+              {isEditing ? "Edit Song" : "Add Song Book"}
             </h1>
-            <p className="mt-1 text-neutral-500">
-              Fill in the details for your digital hymnbook entry.
+            <p className="mt-1 text-sm text-neutral-500 font-light">
+              Create a premium digital hymn book entry.
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             onClick={() => router.back()}
-            className="rounded-xl"
+            className="rounded-xl text-neutral-500 font-medium"
           >
-            Cancel
+            Discard
           </Button>
           <Button
             type="submit"
             disabled={loading}
-            className="rounded-xl gap-2 shadow-lg shadow-neutral-200"
+            className="rounded-xl h-12 px-6 gap-2 bg-neutral-900 shadow-xl shadow-neutral-200"
           >
-            <Save className="h-4 w-4" />
-            {loading ? "Saving..." : "Save Song"}
+            {loading ? "Saving..." : <><Save className="h-4 w-4" /> Save Entry</>}
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 px-6 lg:px-0">
         <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="title" className="text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                <Type className="h-4 w-4 text-neutral-400" />
+          <div className="rounded-[2.5rem] border border-neutral-100 bg-white p-10 shadow-sm space-y-8">
+            <div className="space-y-3">
+              <Label htmlFor="title" className="text-xs font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+                <Type className="h-3 w-3" />
                 Song Title
               </Label>
               <Input
                 id="title"
                 required
-                placeholder="Enter song title..."
+                placeholder="Amazing Grace..."
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="h-12 rounded-xl border-neutral-200 focus-visible:ring-neutral-900"
+                className="h-14 rounded-2xl border-neutral-100 bg-neutral-50/50 focus:bg-white text-lg font-medium transition-all"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                Lyrics (Rich Text)
+            <div className="space-y-3">
+              <Label className="text-xs font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+                Lyrics Content
               </Label>
-              <Editor
-                content={formData.lyrics}
-                onChange={(content) => setFormData({ ...formData, lyrics: content })}
-              />
+              <div className="rounded-2xl border border-neutral-100 overflow-hidden">
+                <Editor
+                  content={formData.lyrics}
+                  onChange={(content) => setFormData({ ...formData, lyrics: content })}
+                />
+              </div>
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-3xl border border-neutral-200 bg-white p-8 shadow-sm space-y-6">
-            <h3 className="flex items-center gap-2 font-serif text-lg font-bold text-neutral-900">
-              <Settings className="h-5 w-5 text-neutral-400" />
-              Metadata
+          <div className="rounded-[2.5rem] border border-neutral-100 bg-white p-10 shadow-sm space-y-8">
+            <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-neutral-400">
+              <Settings className="h-3 w-3" />
+              Configuration
             </h3>
 
-            <div className="space-y-2">
-              <Label htmlFor="songNumber" className="text-sm font-semibold text-neutral-700">
-                Song/Hymn Number
+            <div className="space-y-3">
+              <Label htmlFor="songNumber" className="text-xs font-bold uppercase tracking-widest text-neutral-400">
+                Song Number
               </Label>
               <Input
                 id="songNumber"
-                placeholder="e.g. 101, A-42"
+                type="number"
+                placeholder="001"
                 value={formData.songNumber}
                 onChange={(e) => setFormData({ ...formData, songNumber: e.target.value })}
-                className="rounded-xl border-neutral-200"
+                className="h-12 rounded-xl border-neutral-100 bg-neutral-50/50"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="author" className="text-sm font-semibold text-neutral-700">
-                Author / Composer
-              </Label>
-              <Input
-                id="author"
-                placeholder="Name or source"
-                value={formData.author}
-                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                className="rounded-xl border-neutral-200"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                <Layout className="h-4 w-4 text-neutral-400" />
-                Category
-              </Label>
-              <Select
-                value={formData.category}
-                onValueChange={(val) => setFormData({ ...formData, category: val })}
-              >
-                <SelectTrigger className="rounded-xl border-neutral-200">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  <SelectItem value="Worship">Worship</SelectItem>
-                  <SelectItem value="Praise">Praise</SelectItem>
-                  <SelectItem value="Christmas">Christmas</SelectItem>
-                  <SelectItem value="Lent">Lent / Easter</SelectItem>
-                  <SelectItem value="Hymn">Hymn</SelectItem>
-                  <SelectItem value="Special">Special Songs</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                <Globe className="h-4 w-4 text-neutral-400" />
+            <div className="space-y-3">
+              <Label className="text-xs font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+                <Globe className="h-3 w-3" />
                 Language
               </Label>
               <Select
                 value={formData.language}
-                onValueChange={(val) => setFormData({ ...formData, language: val })}
+                onValueChange={(val) => setFormData({ ...formData, language: val as any })}
               >
-                <SelectTrigger className="rounded-xl border-neutral-200">
-                  <SelectValue placeholder="Select language" />
+                <SelectTrigger className="h-12 rounded-xl border-neutral-100 bg-neutral-50/50">
+                  <SelectValue placeholder="Language" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl">
+                <SelectContent className="rounded-2xl border-neutral-100">
                   <SelectItem value="Hindi">Hindi</SelectItem>
                   <SelectItem value="English">English</SelectItem>
                   <SelectItem value="Odia">Odia</SelectItem>
-                  <SelectItem value="Both">Bilingual</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                <TagIcon className="h-4 w-4 text-neutral-400" />
+            <div className="space-y-3 pt-4 border-t border-neutral-50">
+              <Label className="text-xs font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+                <TagIcon className="h-3 w-3" />
                 Tags
               </Label>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Add tag..."
+                  placeholder="Hymn..."
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
-                  className="rounded-xl border-neutral-200"
+                  className="h-10 rounded-xl border-neutral-100 bg-neutral-50/50"
                 />
-                <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
+                <Button type="button" variant="outline" onClick={addTag} className="rounded-xl h-10 border-neutral-100">
                   Add
                 </Button>
               </div>
-              <div className="flex flex-wrap gap-2 mt-3">
+              <div className="flex flex-wrap gap-1.5 mt-3">
                 {formData.tags.map((tag: string) => (
                   <span
                     key={tag}
-                    className="flex items-center gap-1 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-600"
+                    className="flex items-center gap-1 rounded-full bg-neutral-50 border border-neutral-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-neutral-400"
                   >
                     {tag}
                     <button type="button" onClick={() => removeTag(tag)}>
-                      <X className="h-3 w-3 hover:text-red-500" />
+                      <X className="h-2.5 w-2.5 hover:text-red-500 transition-colors" />
                     </button>
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
-              <span className="text-sm font-semibold text-neutral-700">Live Session / Current Set</span>
-              <Switch
-                checked={formData.isLive}
-                onCheckedChange={(checked: boolean) => 
-                  setFormData({ ...formData, isLive: checked })
-                }
-              />
-            </div>
+            <div className="space-y-4 pt-6 mt-6 border-t border-neutral-50">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">Live Set</span>
+                <Switch
+                  checked={formData.isLive}
+                  onCheckedChange={(checked: boolean) => 
+                    setFormData({ ...formData, isLive: checked })
+                  }
+                />
+              </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
-              <span className="text-sm font-semibold text-neutral-700">Visible to Public</span>
-              <Switch
-                checked={formData.status === "published"}
-                onCheckedChange={(checked: boolean) => 
-                  setFormData({ ...formData, status: checked ? "published" : "draft" })
-                }
-              />
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">Published</span>
+                <Switch
+                  checked={formData.status === "published"}
+                  onCheckedChange={(checked: boolean) => 
+                    setFormData({ ...formData, status: checked ? "published" : "draft" })
+                  }
+                />
+              </div>
             </div>
           </div>
         </div>

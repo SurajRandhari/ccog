@@ -4,52 +4,42 @@ import Song from "@/models/Song";
 import slugify from "slugify";
 import { logActivity } from "@/lib/audit";
 
-// GET /api/songs - Fetch all songs with filters and pagination
+// GET /api/songs - Fetch all songs with filters and sorting
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
     
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const search = searchParams.get("search") || "";
-    const language = searchParams.get("language") || "";
+    const sortField = searchParams.get("sort") || "songNumber"; 
+    const sortOrder = searchParams.get("order") === "desc" ? -1 : 1;
+    const lang = searchParams.get("lang") || "";
     const category = searchParams.get("category") || "";
-    const skip = (page - 1) * limit;
 
     const query: any = { status: "published" };
 
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { lyrics: { $regex: search, $options: "i" } }
-      ];
-    }
-
-    if (language) {
-      query.language = language;
+    if (lang) {
+      query.language = { $regex: new RegExp(`^${lang}$`, "i") };
     }
 
     if (category) {
       query.category = category;
     }
 
-    const songs = await Song.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    let sortOptions: any = {};
+    if (sortField === "title") {
+      sortOptions = { title: sortOrder };
+    } else if (sortField === "language") {
+      sortOptions = { language: sortOrder, songNumber: 1 };
+    } else {
+      // Default to number sorting
+      sortOptions = { songNumber: sortOrder, title: 1 };
+    }
 
-    const total = await Song.countDocuments(query);
+    const songs = await Song.find(query).sort(sortOptions);
 
     return NextResponse.json({
       success: true,
       data: songs,
-      pagination: {
-        total,
-        page,
-        limit,
-        pages: Math.ceil(total / limit)
-      }
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });

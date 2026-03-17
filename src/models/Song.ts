@@ -3,10 +3,9 @@ import mongoose, { Schema, Document, Model, Types } from "mongoose";
 export interface ISong extends Document {
   title: string;
   slug: string;
-  songNumber?: string | null;
-  lyrics: string | null;
+  songNumber?: number | null;
+  lyrics: string;
   language: "Hindi" | "English" | "Odia";
-  author: string | null;
   category: "worship" | "praise" | "traditional";
   status: "draft" | "published";
   isLive?: boolean;
@@ -20,7 +19,7 @@ const songSchema = new Schema<ISong>(
   {
     title: { type: String, required: true, trim: true, maxlength: 200 },
     slug: { type: String, unique: true, trim: true },
-    songNumber: { type: String, trim: true, default: null },
+    songNumber: { type: Number, default: null },
     lyrics: { type: String, required: true },
     language: { 
       type: String, 
@@ -29,12 +28,11 @@ const songSchema = new Schema<ISong>(
       default: "English",
       trim: true 
     },
-    author: { type: String, required: true, default: "Unknown", trim: true },
     category: { 
       type: String, 
       required: true, 
-      enum: ["worship", "praise", "traditional"],
-      default: "worship",
+      enum: ["Worship", "Praise", "Christmas", "Lent", "Hymn", "Special Songs", "Live"],
+      default: "Worship",
       trim: true 
     },
     tags: [{ type: String, trim: true }],
@@ -53,6 +51,7 @@ const songSchema = new Schema<ISong>(
 );
 
 songSchema.index({ slug: 1 }, { unique: true });
+songSchema.index({ songNumber: 1 });
 songSchema.index({ status: 1, title: 1 });
 songSchema.index({ language: 1 });
 songSchema.index({ tags: 1 });
