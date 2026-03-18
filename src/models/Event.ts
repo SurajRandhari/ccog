@@ -8,6 +8,7 @@ export interface IEvent extends Document {
   date: Date;
   time: string;
   image: string;
+  category: string;
   status: "draft" | "published";
   createdBy: Types.ObjectId;
   createdAt: Date;
@@ -23,6 +24,7 @@ const eventSchema = new Schema<IEvent>(
     date: { type: Date, required: true },
     time: { type: String, required: true, trim: true },
     image: { type: String, required: true },
+    category: { type: String, required: true, default: "General" },
     status: {
       type: String,
       enum: ["draft", "published"],
@@ -38,7 +40,7 @@ const eventSchema = new Schema<IEvent>(
 
 eventSchema.index({ slug: 1 }, { unique: true });
 eventSchema.index({ status: 1, startDate: 1 });
-eventSchema.index({ type: 1, status: 1 });
+eventSchema.index({ category: 1, status: 1 });
 
 const Event: Model<IEvent> =
   mongoose.models.Event || mongoose.model<IEvent>("Event", eventSchema);

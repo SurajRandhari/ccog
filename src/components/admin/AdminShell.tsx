@@ -86,7 +86,7 @@ export default function AdminShell({ children }: AdminShellProps) {
   return (
     <div className="flex min-h-screen bg-neutral-50/50">
       {/* Sidebar for Desktop */}
-      <aside className="hidden w-72 border-r border-neutral-200 bg-white lg:block">
+      <aside className="hidden w-72 flex-col border-r border-neutral-200 bg-white lg:flex sticky top-0 h-screen overflow-y-auto">
         <div className="flex h-16 items-center border-b border-neutral-100 px-8">
           <Link href="/admin" className="font-serif text-xl font-bold text-neutral-900">
             Calvary Admin
@@ -125,7 +125,7 @@ export default function AdminShell({ children }: AdminShellProps) {
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="w-full justify-start gap-3 rounded-xl text-neutral-500 hover:text-red-600"
+            className="w-full justify-start gap-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 font-medium transition-colors"
           >
             <LogOut className="h-4 w-4" />
             Sign Out
@@ -172,7 +172,7 @@ export default function AdminShell({ children }: AdminShellProps) {
                     <Button
                       variant="ghost"
                       onClick={handleLogout}
-                      className="w-full justify-start gap-3 rounded-xl text-neutral-500 hover:text-red-600"
+                      className="w-full justify-start gap-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 font-medium transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
                       Sign Out
@@ -192,9 +192,6 @@ export default function AdminShell({ children }: AdminShellProps) {
           </div>
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="relative rounded-full" onClick={handleLogout}>
-              <LogOut className="h-5 w-5 text-neutral-400 hover:text-red-600" />
-            </Button>
             <Button variant="ghost" size="icon" className="relative rounded-full">
               <Bell className="h-5 w-5 text-neutral-500" />
               <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />

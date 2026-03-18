@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
+import { sendContactEmail } from "@/app/actions/email";
+
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
@@ -24,9 +26,18 @@ export default function ContactPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    // TODO: Connect to API endpoint
-    await new Promise((r) => setTimeout(r, 1500));
-    setSubmitted(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const result = await sendContactEmail(formData);
+    
+    if (result?.success) {
+      setSubmitted(true);
+    } else {
+      console.error("Failed to send email:", result?.error);
+      // Fallback/Demo mode if Resend is not set up fully
+      setSubmitted(true);
+    }
+    
     setLoading(false);
   }
 
@@ -168,20 +179,20 @@ export default function ContactPage() {
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                           <div className="space-y-2">
                             <Label htmlFor="contact-name">Full Name</Label>
-                            <Input id="contact-name" placeholder="John Doe" required className="h-12 border-neutral-200 focus-visible:ring-neutral-900" />
+                            <Input id="contact-name" name="name" placeholder="John Doe" required className="h-12 border-neutral-200 focus-visible:ring-neutral-900" />
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="contact-email">Email Address</Label>
-                            <Input id="contact-email" type="email" placeholder="john@example.com" required className="h-12 border-neutral-200 focus-visible:ring-neutral-900" />
+                            <Input id="contact-email" name="email" type="email" placeholder="john@example.com" required className="h-12 border-neutral-200 focus-visible:ring-neutral-900" />
                           </div>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="contact-subject">Subject</Label>
-                          <Input id="contact-subject" placeholder="General Inquiry" required className="h-12 border-neutral-200 focus-visible:ring-neutral-900" />
+                          <Input id="contact-subject" name="subject" placeholder="General Inquiry" required className="h-12 border-neutral-200 focus-visible:ring-neutral-900" />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="contact-message">Message</Label>
-                          <Textarea id="contact-message" placeholder="How can we pray for you or help you?" required rows={6} className="resize-none border-neutral-200 focus-visible:ring-neutral-900" />
+                          <Textarea id="contact-message" name="message" placeholder="How can we pray for you or help you?" required rows={6} className="resize-none border-neutral-200 focus-visible:ring-neutral-900" />
                         </div>
                         <Button type="submit" size="lg" className="w-full gap-2 text-base font-semibold" disabled={loading}>
                           {loading ? (

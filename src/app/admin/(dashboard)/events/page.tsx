@@ -70,6 +70,7 @@ export default function EventsAdminPage() {
     date: new Date().toISOString().split('T')[0],
     time: "10:00 AM",
     image: "",
+    category: "Worship",
     status: "published"
   });
 
@@ -105,6 +106,7 @@ export default function EventsAdminPage() {
       date: new Date().toISOString().split('T')[0],
       time: "10:00 AM",
       image: "",
+      category: "Worship",
       status: "published"
     });
     setIsDialogOpen(true);
@@ -119,6 +121,7 @@ export default function EventsAdminPage() {
       date: new Date(event.date).toISOString().split('T')[0],
       time: event.time,
       image: event.image,
+      category: event.category || "Worship",
       status: event.status
     });
     setIsDialogOpen(true);
@@ -362,6 +365,21 @@ export default function EventsAdminPage() {
                   required
                   className="rounded-xl border-neutral-200"
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <select 
+                  id="category" 
+                  value={formData.category} 
+                  onChange={e => setFormData({...formData, category: e.target.value})} 
+                  className="w-full h-11 rounded-xl border border-neutral-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+                >
+                  <option value="Worship">Worship</option>
+                  <option value="Youth">Youth</option>
+                  <option value="Teaching">Teaching</option>
+                  <option value="Outreach">Outreach</option>
+                  <option value="Special">Special</option>
+                </select>
               </div>
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="location">Location</Label>
