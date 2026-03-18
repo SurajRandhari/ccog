@@ -86,7 +86,7 @@ export default function AdminShell({ children }: AdminShellProps) {
   return (
     <div className="flex min-h-screen bg-neutral-50/50">
       {/* Sidebar for Desktop */}
-      <aside className="hidden w-72 flex-col border-r border-neutral-200 bg-white lg:flex sticky top-0 h-screen overflow-y-auto">
+      <aside className="fixed inset-y-0 left-0 z-50 hidden w-72 flex-col border-r border-neutral-200 bg-white lg:flex overflow-y-auto">
         <div className="flex h-16 items-center border-b border-neutral-100 px-8">
           <Link href="/admin" className="font-serif text-xl font-bold text-neutral-900">
             Calvary Admin
@@ -134,7 +134,7 @@ export default function AdminShell({ children }: AdminShellProps) {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col lg:pl-72">
         {/* Top Header */}
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-neutral-200 bg-white/80 px-6 backdrop-blur-md lg:px-8">
           <div className="flex items-center gap-4">
