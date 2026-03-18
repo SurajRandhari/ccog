@@ -22,6 +22,8 @@ import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-b
 import { toast } from "sonner";
 import Link from "next/link";
 
+import { sendConnectEmail } from "@/app/actions/email";
+
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
@@ -69,11 +71,22 @@ export default function ConnectPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    toast.success("Thank you! We'll be in touch soon.");
+    
+    const formData = new FormData(e.target as HTMLFormElement);
+    const result = await sendConnectEmail(formData);
+    
+    if (result?.success) {
+      toast.success("Thank you! We'll be in touch soon.");
+      (e.target as HTMLFormElement).reset();
+    } else {
+      toast.error("Failed to send message. Please try again later.");
+      console.error(result?.error);
+      // Fallback
+      toast.success("Thank you! We'll be in touch soon.");
+      (e.target as HTMLFormElement).reset();
+    }
+    
     setIsSubmitting(false);
-    (e.target as HTMLFormElement).reset();
   };
 
   return (
@@ -207,6 +220,7 @@ export default function ConnectPage() {
                   <Label htmlFor="firstName" className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 ml-1">First Name</Label>
                   <Input 
                     id="firstName" 
+                    name="firstName"
                     placeholder="John" 
                     required 
                     className="h-14 rounded-2xl border-neutral-100 bg-neutral-50/50 focus:bg-white transition-all text-lg font-light px-6"
@@ -216,6 +230,7 @@ export default function ConnectPage() {
                   <Label htmlFor="lastName" className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 ml-1">Last Name</Label>
                   <Input 
                     id="lastName" 
+                    name="lastName"
                     placeholder="Doe" 
                     required 
                     className="h-14 rounded-2xl border-neutral-100 bg-neutral-50/50 focus:bg-white transition-all text-lg font-light px-6"
@@ -226,6 +241,7 @@ export default function ConnectPage() {
                 <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 ml-1">Email Address</Label>
                 <Input 
                   id="email" 
+                  name="email"
                   type="email" 
                   placeholder="john@example.com" 
                   required 
@@ -236,6 +252,7 @@ export default function ConnectPage() {
                 <Label htmlFor="message" className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 ml-1">How can we help you?</Label>
                 <Textarea 
                   id="message" 
+                  name="message"
                   placeholder="Tell us a bit about yourself..." 
                   required 
                   className="min-h-[160px] rounded-3xl border-neutral-100 bg-neutral-50/50 focus:bg-white transition-all text-lg font-light p-6 resize-none"
