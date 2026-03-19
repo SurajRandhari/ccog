@@ -308,19 +308,19 @@ const ListItem = forwardRef<
   return (
     <li>
       <NavigationMenuLink asChild>
-        <a
-          ref={ref}
+        <Link
+          ref={ref as any}
           className={cn(
             "block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-neutral-50 hover:text-neutral-900 focus:bg-neutral-50 focus:text-neutral-900",
             className
           )}
-          {...props}
+          {...(props as any)}
         >
           <div className="text-sm font-semibold leading-none">{title}</div>
           <p className="line-clamp-2 text-xs leading-snug text-neutral-500">
             {children}
           </p>
-        </a>
+        </Link>
       </NavigationMenuLink>
     </li>
   );
