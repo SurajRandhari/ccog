@@ -90,7 +90,7 @@ export default function ContactPage() {
                   </div>
                   <h4 className="mt-6 font-semibold text-neutral-900">Address</h4>
                   <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
-                    123 Calvary Lane<br />Cityville, ST 12345
+                    Nagarnar, Jagdalpur<br />Dist-Bastar, CG 494001
                   </p>
                 </div>
 
@@ -126,13 +126,18 @@ export default function ContactPage() {
               </div>
 
               {/* Map Placeholder */}
-              <div className="relative aspect-video overflow-hidden rounded-[2rem] border border-neutral-200 bg-neutral-200 lg:aspect-square">
-                 <div className="absolute inset-0 flex items-center justify-center text-neutral-400">
-                    <div className="text-center">
-                      <MapPin className="mx-auto h-12 w-12 opacity-20" />
-                      <p className="mt-4 text-xs font-medium uppercase tracking-widest opacity-50">Interactive Map Placeholder</p>
-                    </div>
-                 </div>
+              <div className="relative aspect-video overflow-hidden rounded-[2rem] border border-neutral-200 bg-neutral-100 lg:aspect-square">
+                 <iframe
+                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15024.1670417961!2d82.1643!3d19.1007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDA2JzAyLjciTiA4MsKwMTAnMzAuNyJF!5e0!3m2!1sen!2sin!4v1710920000000!5m2!1sen!2sin"
+                   width="100%"
+                   height="100%"
+                   style={{ border: 0 }}
+                   allowFullScreen
+                   loading="lazy"
+                   referrerPolicy="no-referrer-when-downgrade"
+                   title="Calvary Church of God Location"
+                   className="grayscale hover:grayscale-0 transition-all duration-700"
+                 />
               </div>
             </motion.div>
 

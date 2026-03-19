@@ -17,18 +17,31 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "Calvary Church of God",
+    default: "Calvary Church of God | Nagarnar - Jagdalpur, Chhattisgarh",
     template: "%s | Calvary Church of God",
   },
   description:
-    "Welcome to Calvary Church of God — a community of faith, hope, and love. Join us for worship, sermons, devotions, and fellowship.",
+    "Calvary Church of God in Nagarnar (Jagdalpur, Bastar, Chhattisgarh) is a vibrant community of the Indian Pentecostal Church. Join us for worship, spirit-filled sermons, and fellowship. 494001.",
+  keywords: [
+    "Calvary Church of God",
+    "Church in Nagarnar",
+    "Church in Jagdalpur",
+    "Church in Bastar",
+    "Church in Chhattisgarh",
+    "Indian Pentecostal Church",
+    "IPC Nagarnar",
+    "Pastor Suresh Randhari",
+    "Christian Church Jagdalpur",
+  ],
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    process.env.NEXT_PUBLIC_SITE_URL || "https://ccog-nagarnar.vercel.app"
   ),
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "en_IN",
     siteName: "Calvary Church of God",
+    title: "Calvary Church of God | Nagarnar - Jagdalpur",
+    description: "Welcome to Calvary Church of God, Nagarnar. A spirit-filled Indian Pentecostal Church in Jagdalpur, Bastar.",
   },
 };
 
@@ -40,6 +53,38 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body className="font-sans antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "PlaceOfWorship",
+              "name": "Calvary Church of God",
+              "description": "Indian Pentecostal Church in Nagarnar, Jagdalpur, Bastar, Chhattisgarh.",
+              "url": "https://ccog-nagarnar.vercel.app",
+              "logo": "https://ccog-nagarnar.vercel.app/images/logo.png",
+              "image": "https://ccog-nagarnar.vercel.app/images/site/hero.png",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Nagarnar",
+                "addressLocality": "Jagdalpur",
+                "addressRegion": "Chhattisgarh",
+                "postalCode": "494001",
+                "addressCountry": "IN"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": "19.100750",
+                "longitude": "82.175194"
+              },
+              "openingHours": [
+                "Su 10:00-13:00",
+                "We 19:00-21:00",
+                "Fr 19:00-21:00"
+              ]
+            })
+          }}
+        />
         {children}
         <Toaster position="top-right" richColors closeButton />
       </body>

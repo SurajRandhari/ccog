@@ -53,9 +53,11 @@ export default function Footer() {
                 </p>
               </div>
             </Link>
-            <p className="mt-4 text-sm leading-relaxed text-neutral-500">
-              A community of faith, hope, and love. Join us as we grow together
-              in the grace and knowledge of our Lord Jesus Christ.
+            <p className="mt-4 text-sm leading-relaxed text-neutral-900 font-medium">
+              Nagarnar, Jagdalpur, Dist-Bastar, Chhattisgarh, 494001
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-500 italic">
+              A community of faith, hope, and love. Proud member of the Indian Pentecostal Church.
             </p>
           </div>
 

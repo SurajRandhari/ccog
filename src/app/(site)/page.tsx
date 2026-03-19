@@ -246,26 +246,41 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="lg:col-span-7 bg-white rounded-[3rem] border border-neutral-100 shadow-xl overflow-hidden group"
+              className="lg:col-span-7 bg-white rounded-[3rem] border border-neutral-100 shadow-2xl shadow-neutral-200/50 overflow-hidden group relative"
             >
-              <div className="aspect-video relative overflow-hidden">
-                <img src="/images/site/sermon_current.png" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Current Series" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-8 left-8 right-8 flex items-end justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-2 block">Current Series</span>
-                    <h3 className="text-3xl font-serif font-semibold text-white">The Grace of God</h3>
+              <div className="aspect-[16/10] relative overflow-hidden">
+                <img 
+                  src="/images/site/sermon_current.png" 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" 
+                  alt="Current Series" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                
+                {/* Glass Badge */}
+                <div className="absolute top-8 left-8">
+                  <span className="inline-flex items-center rounded-full bg-white/10 backdrop-blur-md px-4 py-1.5 text-[10px] font-bold text-white uppercase tracking-[0.2em] border border-white/10">
+                    Current Series
+                  </span>
+                </div>
+
+                <div className="absolute bottom-8 left-8 right-8 flex items-end justify-between gap-6">
+                  <div className="max-w-md">
+                    <h3 className="text-4xl md:text-5xl font-serif font-semibold text-white mb-4 leading-tight">The Grace <br />of God</h3>
+                    <p className="text-white/60 font-light text-sm line-clamp-2">Exploring the unmerited favor of God and its transformative power in our daily lives.</p>
                   </div>
-                  <div className="h-12 w-12 rounded-full bg-white flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform">
-                    <Play className="h-5 w-5 text-neutral-900 fill-current" />
+                  <div className="h-16 w-16 rounded-full bg-white flex items-center justify-center shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition-all duration-300">
+                    <Play className="h-6 w-6 text-neutral-900 fill-current ml-1" />
                   </div>
                 </div>
               </div>
-              <div className="p-10 flex items-center justify-between border-t border-neutral-50">
-                <p className="text-neutral-500 font-light">Explore our archive of spirit-filled messages.</p>
+              <div className="p-8 md:p-10 flex items-center justify-between bg-neutral-50/50 backdrop-blur-sm border-t border-neutral-100/50">
+                <div className="flex items-center gap-4">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <p className="text-neutral-500 text-sm font-medium">New message added Sunday</p>
+                </div>
                 <Link href="/resources/sermons">
-                  <Button variant="ghost" className="gap-2 text-neutral-900 font-bold hover:bg-neutral-50 transition-colors">
-                    View Archive <ArrowRight className="h-4 w-4" />
+                  <Button variant="ghost" className="gap-2 text-neutral-900 font-bold hover:bg-white rounded-full transition-colors group/btn">
+                    View Archive <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
               </div>
@@ -277,34 +292,44 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="lg:col-span-5 bg-neutral-900 rounded-[3rem] p-10 lg:p-12 text-white flex flex-col justify-between relative overflow-hidden group"
+              className="lg:col-span-5 bg-neutral-950 rounded-[3rem] p-10 lg:p-12 text-white flex flex-col justify-between relative overflow-hidden group shadow-2xl shadow-neutral-900/40"
             >
-              <div className="absolute top-0 right-0 h-40 w-40 bg-white/5 rounded-full -mr-20 -mt-20 blur-2xl group-hover:bg-white/10 transition-colors" />
+              {/* Decorative Mesh Gradient */}
+              <div className="absolute -top-24 -right-24 h-96 w-96 bg-white/5 rounded-full blur-[100px] group-hover:bg-white/10 transition-all duration-1000" />
+              <div className="absolute -bottom-24 -left-24 h-64 w-64 bg-white/5 rounded-full blur-[80px]" />
               
-              <div>
-                <div className="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center mb-8 border border-white/10">
-                  <Music className="h-6 w-6 text-white" />
+              <div className="relative z-10">
+                <div className="h-16 w-16 rounded-3xl bg-white/10 flex items-center justify-center mb-10 border border-white/10 backdrop-blur-sm group-hover:rotate-6 transition-transform duration-500">
+                  <Music className="h-7 w-7 text-white" />
                 </div>
-                <h3 className="font-serif text-4xl font-semibold mb-6">Worship & <br />Lyrics</h3>
-                <p className="text-white/60 font-light text-lg leading-relaxed mb-8">
-                  Sing along with our congregation. Access our lyrics library for worship, praise, and special songs.
+                <h3 className="font-serif text-5xl font-semibold mb-8 leading-tight tracking-tight">Worship & <br />Lyrics</h3>
+                <p className="text-white/50 font-light text-lg leading-relaxed mb-12">
+                  Sing along with our congregation. Access our digital hymn book for worship, praise, and special songs.
                 </p>
                 <Link href="/resources/songs">
-                  <InteractiveHoverButton className="w-full bg-white text-neutral-900 border-none py-4">
+                  <Button className="w-full bg-white text-neutral-950 hover:bg-neutral-200 border-none py-7 rounded-2xl font-bold text-lg shadow-xl shadow-black/20 group-hover:-translate-y-1 transition-all duration-300">
                     Explore Song Book
-                  </InteractiveHoverButton>
+                  </Button>
                 </Link>
               </div>
 
-              <div className="mt-12 flex items-center gap-3">
-                <div className="flex -space-x-3">
-                  {[1,2,3].map(i => (
-                    <div key={i} className="h-10 w-10 rounded-full border-2 border-neutral-900 bg-neutral-800 overflow-hidden">
-                      <img src={`https://i.pravatar.cc/100?u=${i}`} alt="Avatar" />
-                    </div>
-                  ))}
+              <div className="relative z-10 mt-16 flex items-center justify-between border-t border-white/5 pt-8">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-3">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className="h-12 w-12 rounded-full border-4 border-neutral-950 bg-neutral-900 overflow-hidden shadow-lg">
+                        <img src={`https://i.pravatar.cc/150?u=church_${i}`} alt="User" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="ml-2">
+                    <p className="text-sm font-bold text-white">500+ members</p>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Worshipping together</p>
+                  </div>
                 </div>
-                <span className="text-sm text-white/40">Join 500+ worshippers</span>
+                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10">
+                  <Zap className="h-4 w-4 text-white/40" />
+                </div>
               </div>
             </motion.div>
           </div>
@@ -365,12 +390,12 @@ export default function HomePage() {
                 <LocationItem 
                   icon={MapPin}
                   title="Our Location"
-                  desc="Calvary Church of God, Sector-12, RK Puram, New Delhi, 110022"
+                  desc="Calvary Church of God, Nagarnar, Jagdalpur, Dist-Bastar, Chhattisgarh, 494001"
                 />
                 <LocationItem 
                   icon={Clock}
                   title="Worship Times"
-                  desc="Sundays at 10:00 AM — Join us for a powerful time of worship and word."
+                  desc="Sundays at 10:00 AM — Join us for a powerful time of spirit-filled worship and the Word."
                 />
               </div>
               <div className="mt-12">
@@ -381,13 +406,19 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="relative h-[500px] rounded-[3rem] overflow-hidden shadow-2xl shadow-neutral-200/50 grayscale hover:grayscale-0 transition-all duration-700">
-               <img 
-                 src="https://images.unsplash.com/photo-1548337138-e87d889cc369?q=80&w=2000&auto=format&fit=crop" 
-                 alt="Google Maps Placeholder" 
-                 className="w-full h-full object-cover border border-neutral-100"
+            <div className="relative h-[500px] rounded-[3rem] overflow-hidden shadow-2xl shadow-neutral-200/50 border border-neutral-100">
+               <iframe
+                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15024.1670417961!2d82.1643!3d19.1007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDA2JzAyLjciTiA4MsKwMTAnMzAuNyJF!5e0!3m2!1sen!2sin!4v1710920000000!5m2!1sen!2sin"
+                 width="100%"
+                 height="100%"
+                 style={{ border: 0 }}
+                 allowFullScreen
+                 loading="lazy"
+                 referrerPolicy="no-referrer-when-downgrade"
+                 title="Calvary Church of God Location"
+                 className="grayscale hover:grayscale-0 transition-all duration-700"
                />
-               <div className="absolute inset-0 bg-neutral-900/10 pointer-events-none" />
+               <div className="absolute inset-0 bg-neutral-900/5 pointer-events-none" />
             </div>
           </div>
         </div>
