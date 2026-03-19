@@ -17,7 +17,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "Calvary Church of God | Nagarnar - Jagdalpur, Chhattisgarh",
+    default: "Calvary Church of God | Nagarnar - Jagdalpur, Bastar",
     template: "%s | Calvary Church of God",
   },
   description:
