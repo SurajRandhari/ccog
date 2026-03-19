@@ -36,13 +36,22 @@ export default function Footer() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link href="/" className="inline-block">
-              <h3 className="font-serif text-xl font-semibold tracking-tight text-neutral-900">
-                Calvary
-              </h3>
-              <p className="text-xs font-light tracking-widest text-neutral-500 uppercase">
-                Church of God
-              </p>
+            <Link href="/" className="flex items-center gap-3 mb-4">
+              <div className="h-12 w-12">
+                <img
+                  src="/images/logo.png"
+                  alt="Calvary Church of God Logo"
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl font-semibold tracking-tight text-neutral-900">
+                  Calvary
+                </h3>
+                <p className="text-xs font-light tracking-widest text-neutral-500 uppercase">
+                  Church of God
+                </p>
+              </div>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-neutral-500">
               A community of faith, hope, and love. Join us as we grow together

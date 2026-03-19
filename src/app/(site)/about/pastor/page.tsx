@@ -42,7 +42,7 @@ export default function PastorPage() {
               className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-neutral-100 shadow-2xl shadow-neutral-200 lg:max-w-md lg:justify-self-end"
             >
               <img
-                src="/images/site/pastor.png"
+                src="/images/site/pastor.jpg"
                 alt="Rev. Suresh Randhari"
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
               />

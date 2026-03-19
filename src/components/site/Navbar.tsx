@@ -67,14 +67,23 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 transition-opacity hover:opacity-80"
+            className="flex items-center gap-3 transition-opacity hover:opacity-80"
           >
-            <span className="font-serif text-xl font-semibold tracking-tight text-neutral-900 md:text-2xl">
-              Calvary
-            </span>
-            <span className="hidden text-sm font-light tracking-widest text-neutral-500 uppercase sm:inline">
-              Church of God
-            </span>
+            <div className="relative h-10 w-10 md:h-12 md:w-12">
+              <img
+                src="/images/logo.png"
+                alt="Calvary Church of God Logo"
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-serif text-xl font-semibold tracking-tight text-neutral-900 md:text-2xl leading-none">
+                Calvary
+              </span>
+              <span className="text-[10px] font-light tracking-[0.2em] text-neutral-500 uppercase md:text-xs">
+                Church of God
+              </span>
+            </div>
           </Link>
 
           {/* Desktop links */}

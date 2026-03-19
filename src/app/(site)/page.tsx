@@ -79,7 +79,7 @@ export default function HomePage() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <span className="inline-flex items-center rounded-full bg-white/10 px-4 py-1.5 text-[10px] font-bold text-white/60 uppercase tracking-[0.3em] mb-8 border border-white/5 backdrop-blur-sm">
-              Soli Deo Gloria
+             Praise the Lord
             </span>
           </motion.div>
 
@@ -91,7 +91,7 @@ export default function HomePage() {
           >
             Calvary Church
             <br />
-            <span className="text-white/40 italic">of God</span>
+            <span className="text-white/40">of God</span>
           </motion.h1>
 
           <motion.p
@@ -116,10 +116,13 @@ export default function HomePage() {
               </InteractiveHoverButton>
             </Link>
             <Link href="/resources/sermons">
-              <button className="group flex items-center gap-3 px-8 py-3 text-white font-semibold transition-all hover:gap-5">
+              <Button 
+                variant="outline" 
+                className="group h-10 rounded-full px-8 border-white bg-transparent text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 cursor-pointer"
+              >
                 Watch Messages
-                <ArrowRight className="h-5 w-5 text-white/40 group-hover:text-white transition-colors" />
-              </button>
+                <ArrowRight className="ml-2 h-4 w-4 text-white/40 group-hover:text-neutral-900 transition-colors" />
+              </Button>
             </Link>
           </motion.div>
         </div>
@@ -153,7 +156,7 @@ export default function HomePage() {
           >
             <div className="aspect-[4/5] rounded-[3rem] overflow-hidden">
               <img 
-                src="/images/site/pastor.png" 
+                src="/images/site/pastor.jpg" 
                 alt="Rev. Suresh Randhari" 
                 className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-700"
               />
