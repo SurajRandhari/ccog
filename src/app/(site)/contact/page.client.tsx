@@ -44,7 +44,7 @@ export default function ContactPageClient() {
   return (
     <div className="bg-white">
       {/* Header */}
-      <section className="relative py-24 lg:py-32">
+      <section className="relative py-12 lg:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -64,7 +64,7 @@ export default function ContactPageClient() {
       </section>
 
       {/* Main Content */}
-      <section className="bg-neutral-50 py-24 lg:py-32">
+      <section className="bg-neutral-50 py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
             {/* Contact Information */}

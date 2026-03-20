@@ -38,7 +38,7 @@ export default function BlogPage() {
   return (
     <div className="bg-white">
       {/* Header */}
-      <section className="relative overflow-hidden py-24 lg:py-32">
+      <section className="relative overflow-hidden py-16 lg:py-24">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,0,0,0.05)_0%,transparent_50%)]" />
         </div>
@@ -61,7 +61,7 @@ export default function BlogPage() {
       </section>
 
       {/* Grid Section */}
-      <section className="bg-neutral-50 py-24 lg:py-32">
+      <section className="bg-neutral-50 py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           {loading ? (
             <div className="flex min-h-[400px] items-center justify-center">

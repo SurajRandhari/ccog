@@ -16,7 +16,7 @@ export default function PastorPageClient() {
   return (
     <div className="bg-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-24 pb-12 lg:pt-32 lg:pb-24">
+      <section className="relative overflow-hidden pt-16 pb-12 lg:pt-20 lg:pb-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
             <motion.div
@@ -52,7 +52,7 @@ export default function PastorPageClient() {
       </section>
 
       {/* Biography Section */}
-      <section className="bg-neutral-50 py-24 lg:py-32">
+      <section className="bg-neutral-50 py-16 lg:py-24">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -78,7 +78,7 @@ export default function PastorPageClient() {
       </section>
 
       {/* Message Section */}
-      <section className="py-24 lg:py-32">
+      <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="relative rounded-[2.5rem] bg-neutral-950 px-8 py-16 text-center text-white lg:py-24">
             <Quote className="mx-auto h-12 w-12 text-white/20" />

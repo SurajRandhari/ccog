@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { 
-  ArrowRight, 
-  Clock, 
-  MapPin, 
-  BookOpen, 
-  Music, 
-  Users, 
-  HandHeart, 
+import {
+  ArrowRight,
+  Clock,
+  MapPin,
+  BookOpen,
+  Music,
+  Users,
+  HandHeart,
   Play,
   Calendar,
   Zap,
@@ -68,7 +68,7 @@ export default function HomePageClient() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-neutral-900" />
         </motion.div>
-        
+
         <div className="absolute top-0 right-0 h-[32rem] w-[32rem] rounded-full bg-white/5 blur-3xl animate-pulse" />
         <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-white/5 blur-3xl animate-pulse delay-700" />
 
@@ -79,7 +79,7 @@ export default function HomePageClient() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <span className="inline-flex items-center rounded-full bg-white/10 px-4 py-1.5 text-[10px] font-bold text-white/60 uppercase tracking-[0.3em] mb-8 border border-white/5 backdrop-blur-sm">
-             Praise the Lord
+              Praise the Lord
             </span>
           </motion.div>
 
@@ -116,8 +116,8 @@ export default function HomePageClient() {
               </InteractiveHoverButton>
             </Link>
             <Link href="/resources/sermons">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="group h-10 rounded-full px-8 border-white bg-transparent text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 cursor-pointer"
               >
                 Watch Messages
@@ -130,7 +130,7 @@ export default function HomePageClient() {
 
       {/* Service Times Horizontal Bar */}
       <section className="relative z-20 -mt-12 mx-auto max-w-5xl px-6">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -145,7 +145,7 @@ export default function HomePageClient() {
       </section>
 
       {/* Meet Our Pastor Section */}
-      <section className="py-24 lg:py-40 px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+      <section className="py-16 lg:py-24 px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -155,9 +155,9 @@ export default function HomePageClient() {
             className="relative"
           >
             <div className="aspect-[4/5] rounded-[3rem] overflow-hidden">
-              <img 
-                src="/images/site/pastor.jpg" 
-                alt="Rev. Suresh Randhari" 
+              <img
+                src="/images/site/pastor.jpg"
+                alt="Rev. Suresh Randhari"
                 className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-700"
               />
             </div>
@@ -198,10 +198,10 @@ export default function HomePageClient() {
       </section>
 
       {/* Experience Calvary (Core Values) */}
-      <section className="bg-neutral-50 py-24 lg:py-40">
+      <section className="bg-neutral-50 py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -215,21 +215,21 @@ export default function HomePageClient() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <ValueCard 
-              icon={Users} 
-              title="Community" 
+            <ValueCard
+              icon={Users}
+              title="Community"
               desc="Building authentic relationships through small groups and fellowship."
               index={0}
             />
-            <ValueCard 
-              icon={Zap} 
-              title="Discipleship" 
+            <ValueCard
+              icon={Zap}
+              title="Discipleship"
               desc="Deepening our faith through biblical teaching and spiritual growth."
               index={1}
             />
-            <ValueCard 
-              icon={HandHeart} 
-              title="Outreach" 
+            <ValueCard
+              icon={HandHeart}
+              title="Outreach"
               desc="Spreading the love of God to our local community and beyond."
               index={2}
             />
@@ -238,24 +238,24 @@ export default function HomePageClient() {
       </section>
 
       {/* Sermon & Worship Showcases */}
-      <section className="py-24 lg:py-40">
+      <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Recent Messages */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="lg:col-span-7 bg-white rounded-[3rem] border border-neutral-100 shadow-2xl shadow-neutral-200/50 overflow-hidden group relative"
             >
               <div className="aspect-[16/10] relative overflow-hidden">
-                <img 
-                  src="/images/site/sermon_current.png" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" 
-                  alt="Current Series" 
+                <img
+                  src="/images/site/sermon_current.png"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                  alt="Current Series"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                
+
                 {/* Glass Badge */}
                 <div className="absolute top-8 left-8">
                   <span className="inline-flex items-center rounded-full bg-white/10 backdrop-blur-md px-4 py-1.5 text-[10px] font-bold text-white uppercase tracking-[0.2em] border border-white/10">
@@ -287,7 +287,7 @@ export default function HomePageClient() {
             </motion.div>
 
             {/* Song Book Showcase */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -297,7 +297,7 @@ export default function HomePageClient() {
               {/* Decorative Mesh Gradient */}
               <div className="absolute -top-24 -right-24 h-96 w-96 bg-white/5 rounded-full blur-[100px] group-hover:bg-white/10 transition-all duration-1000" />
               <div className="absolute -bottom-24 -left-24 h-64 w-64 bg-white/5 rounded-full blur-[80px]" />
-              
+
               <div className="relative z-10">
                 <div className="h-16 w-16 rounded-3xl bg-white/10 flex items-center justify-center mb-10 border border-white/10 backdrop-blur-sm group-hover:rotate-6 transition-transform duration-500">
                   <Music className="h-7 w-7 text-white" />
@@ -316,7 +316,7 @@ export default function HomePageClient() {
               <div className="relative z-10 mt-16 flex items-center justify-between border-t border-white/5 pt-8">
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-3">
-                    {[1,2,3,4].map(i => (
+                    {[1, 2, 3, 4].map(i => (
                       <div key={i} className="h-12 w-12 rounded-full border-4 border-neutral-950 bg-neutral-900 overflow-hidden shadow-lg">
                         <img src={`https://i.pravatar.cc/150?u=church_${i}`} alt="User" />
                       </div>
@@ -337,7 +337,7 @@ export default function HomePageClient() {
       </section>
 
       {/* Vision Quote Section (Polished) */}
-      <section className="relative overflow-hidden bg-neutral-950 py-32 lg:py-48">
+      <section className="relative overflow-hidden bg-neutral-950 py-20 lg:py-32">
         <div className="absolute inset-0 z-0 opacity-20 hover:opacity-30 transition-opacity duration-1000">
           <img
             src="/images/site/vision.png"
@@ -378,7 +378,7 @@ export default function HomePageClient() {
       </section>
 
       {/* Visit Us / Location Map Section */}
-      <section className="py-24 lg:py-40 bg-white">
+      <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -387,12 +387,12 @@ export default function HomePageClient() {
                 Plan Your Visit
               </h2>
               <div className="space-y-10 group">
-                <LocationItem 
+                <LocationItem
                   icon={MapPin}
                   title="Our Location"
                   desc="Calvary Church of God, Nagarnar, Jagdalpur, Dist-Bastar, Chhattisgarh, 494001"
                 />
-                <LocationItem 
+                <LocationItem
                   icon={Clock}
                   title="Worship Times"
                   desc="Sundays at 10:00 AM — Join us for a powerful time of spirit-filled worship and the Word."
@@ -407,18 +407,18 @@ export default function HomePageClient() {
               </div>
             </div>
             <div className="relative h-[500px] rounded-[3rem] overflow-hidden shadow-2xl shadow-neutral-200/50 border border-neutral-100">
-               <iframe
-                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15024.1670417961!2d82.1643!3d19.1007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDA2JzAyLjciTiA4MsKwMTAnMzAuNyJF!5e0!3m2!1sen!2sin!4v1710920000000!5m2!1sen!2sin"
-                 width="100%"
-                 height="100%"
-                 style={{ border: 0 }}
-                 allowFullScreen
-                 loading="lazy"
-                 referrerPolicy="no-referrer-when-downgrade"
-                 title="Calvary Church of God Location"
-                 className="grayscale hover:grayscale-0 transition-all duration-700"
-               />
-               <div className="absolute inset-0 bg-neutral-900/5 pointer-events-none" />
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15024.1670417961!2d82.1643!3d19.1007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDA2JzAyLjciTiA4MsKwMTAnMzAuNyJF!5e0!3m2!1sen!2sin!4v1710920000000!5m2!1sen!2sin"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Calvary Church of God Location"
+                className="grayscale hover:grayscale-0 transition-all duration-700"
+              />
+              <div className="absolute inset-0 bg-neutral-900/5 pointer-events-none" />
             </div>
           </div>
         </div>
