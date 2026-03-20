@@ -10,6 +10,8 @@ export interface IBlog extends Document {
   tags: string[];
   metaTitle?: string;
   metaDescription?: string;
+  likes: number;
+  likedBy: string[]; // Store IP addresses or User IDs
   createdBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -26,6 +28,8 @@ const blogSchema = new Schema<IBlog>(
     tags: [{ type: String, trim: true }],
     metaTitle: { type: String, trim: true },
     metaDescription: { type: String, trim: true },
+    likes: { type: Number, default: 0 },
+    likedBy: [{ type: String }],
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   {

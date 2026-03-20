@@ -4,6 +4,8 @@ import Blog from "@/models/Blog";
 import { notFound } from "next/navigation";
 import { Calendar, User, ArrowLeft, Tag } from "lucide-react";
 import Link from "next/link";
+import { LikeButton } from "@/components/blog/LikeButton";
+import { CommentSection } from "@/components/blog/CommentSection";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -92,6 +94,14 @@ export default async function BlogPostPage({ params }: Props) {
                          selection:bg-neutral-900 selection:text-white"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
+
+            {/* Like Section */}
+            <div className="mt-20 flex justify-center py-12 border-y border-neutral-100">
+              <LikeButton blogId={post._id.toString()} initialLikes={post.likes || 0} />
+            </div>
+
+            {/* Comment Section */}
+            <CommentSection blogId={post._id.toString()} />
           </div>
         </article>
       </main>

@@ -25,6 +25,14 @@ export async function middleware(request: NextRequest) {
 
   // If it's a protected route, verify the token
   if (isAdminApi || isContentApi || isAdminPage) {
+    // Allow GET requests for content APIs (Public view)
+    // AND allow POST for likes and comments (Public interaction)
+    const isPublicInteraction = (pathname.includes("/like") || pathname.includes("/comments")) && method === "POST";
+    
+    if ((isContentApi && method === "GET") || isPublicInteraction) {
+      return NextResponse.next();
+    }
+
     const token = request.cookies.get("auth_token")?.value;
 
     if (!token) {
