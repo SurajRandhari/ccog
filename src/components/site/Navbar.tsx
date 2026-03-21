@@ -92,10 +92,11 @@ export default function Navbar() {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <Link href="/" legacyBehavior passHref>
-                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), pathname === "/" && "text-neutral-900")}>
-                      Home
-                    </NavigationMenuLink>
+                  <Link 
+                    href="/" 
+                    className={cn(navigationMenuTriggerStyle(), pathname === "/" && "text-neutral-900")}
+                  >
+                    Home
                   </Link>
                 </NavigationMenuItem>
 
@@ -138,26 +139,29 @@ export default function Navbar() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <Link href="/offering" legacyBehavior passHref>
-                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/offering") && "text-neutral-900")}>
-                      Offering
-                    </NavigationMenuLink>
+                  <Link 
+                    href="/offering" 
+                    className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/offering") && "text-neutral-900")}
+                  >
+                    Offering
                   </Link>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <Link href="/events" legacyBehavior passHref>
-                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/events") && "text-neutral-900")}>
-                      Events
-                    </NavigationMenuLink>
+                  <Link 
+                    href="/events" 
+                    className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/events") && "text-neutral-900")}
+                  >
+                    Events
                   </Link>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <Link href="/contact" legacyBehavior passHref>
-                    <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/contact") && "text-neutral-900")}>
-                      Contact
-                    </NavigationMenuLink>
+                  <Link 
+                    href="/contact" 
+                    className={cn(navigationMenuTriggerStyle(), pathname.startsWith("/contact") && "text-neutral-900")}
+                  >
+                    Contact
                   </Link>
                 </NavigationMenuItem>
               </NavigationMenuList>
