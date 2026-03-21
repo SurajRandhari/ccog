@@ -95,6 +95,9 @@ export default function SongsAdminPage() {
       const data = await res.json();
       if (data.success) {
         setSongs(data.data);
+        if (data.pagination) {
+          setTotalPages(data.pagination.pages);
+        }
       }
     } catch (error) {
       toast.error("Failed to fetch songs");

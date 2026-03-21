@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Calendar, User, BookOpen, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -92,9 +93,9 @@ export default async function DevotionDetailPage({ params }: Props) {
             <h3 className="font-serif text-3xl font-semibold text-neutral-900 mb-4">Finding Grace Daily</h3>
             <p className="text-neutral-500 mb-10 max-w-md mx-auto">We hope this reflection strengthened your spirit today. Join us again tomorrow.</p>
             <Link href="/resources/devotions">
-                <Button className="rounded-2xl h-14 px-10 text-base font-bold bg-neutral-900 shadow-2xl shadow-neutral-200">
+                <InteractiveHoverButton className="w-64 bg-white text-neutral-900 border-neutral-100">
                     Explore Archive
-                </Button>
+                </InteractiveHoverButton>
             </Link>
           </footer>
         </article>

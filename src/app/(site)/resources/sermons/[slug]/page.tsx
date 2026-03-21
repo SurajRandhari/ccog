@@ -5,6 +5,8 @@ import { Metadata } from "next";
 import { Calendar, User, Clock, ChevronLeft, Play, FileText, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import { ArrowRight } from "lucide-react";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -45,7 +47,7 @@ export default async function SermonDetailPage({ params }: Props) {
   return (
     <div className="bg-white min-h-screen">
       {/* Navigation */}
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-32">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-12 md:pt-16">
         <Link 
           href="/resources/sermons" 
           className="inline-flex items-center text-sm font-bold uppercase tracking-widest text-neutral-400 hover:text-neutral-900 transition-colors group"
@@ -57,7 +59,7 @@ export default async function SermonDetailPage({ params }: Props) {
 
       <article className="mx-auto max-w-7xl px-6 lg:px-8 py-12">
         {/* Header */}
-        <header className="max-w-4xl mb-16">
+        <header className="max-w-4xl mb-12">
           <div className="flex items-center gap-4 mb-8">
             <span className="inline-flex items-center rounded-full bg-blue-50 px-4 py-1.5 text-[10px] font-bold text-blue-500 uppercase tracking-widest border border-blue-100 uppercase">
                 {sermon.tags?.[0] || 'Sermon'}
@@ -97,7 +99,7 @@ export default async function SermonDetailPage({ params }: Props) {
 
         {/* Video Player Section */}
         {videoId && (
-            <section className="mb-20">
+            <section className="mb-16 md:mb-24">
                 <div className="aspect-video w-full overflow-hidden rounded-[3rem] bg-neutral-900 shadow-3xl ring-1 ring-neutral-200">
                     <iframe
                         width="100%"
@@ -183,15 +185,19 @@ export default async function SermonDetailPage({ params }: Props) {
             <p className="text-xl text-neutral-400 font-light max-w-2xl mx-auto mb-12 leading-relaxed">
                 Connect with us this Sunday and experience the power of God's word in person.
             </p>
-            <div className="flex flex-wrap justify-center gap-6">
+            <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
                 <Link href="/about/connect">
-                    <Button size="lg" className="h-16 px-10 rounded-2xl bg-white text-neutral-950 font-bold hover:bg-neutral-100 shadow-2xl">
-                        I'm New Here
-                    </Button>
+                    <InteractiveHoverButton className="w-64 bg-white text-neutral-900 border-none">
+                        I&apos;m New Here
+                    </InteractiveHoverButton>
                 </Link>
                 <Link href="/about/membership">
-                    <Button size="lg" variant="outline" className="h-16 px-10 rounded-2xl border-white/20 text-white font-bold hover:bg-white/10">
+                    <Button 
+                        variant="outline" 
+                        className="group h-12 rounded-full px-8 border-white bg-transparent text-white hover:bg-white hover:text-neutral-900 transition-all duration-300 cursor-pointer"
+                    >
                         Become a Member
+                        <ArrowRight className="ml-2 h-4 w-4 text-white/40 group-hover:text-neutral-900 transition-colors" />
                     </Button>
                 </Link>
             </div>

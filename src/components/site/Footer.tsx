@@ -17,6 +17,7 @@ const footerLinks = [
       { href: "/resources/devotions", label: "Daily Devotions" },
       { href: "/resources/blog", label: "Blog" },
       { href: "/resources/songs", label: "Songs" },
+      { href: "/resources/prayer", label: "Prayer Request" },
     ],
   },
   {

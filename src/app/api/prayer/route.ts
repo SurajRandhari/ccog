@@ -8,9 +8,10 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB();
     
-    // For now, allow all requests to be seen in admin. 
-    // In a production environment, this would be guarded by session middleware.
-    const requests = await PrayerRequest.find({}).sort({ createdAt: -1 });
+    // Return only public requests for the wall, and omit the email for privacy
+    const requests = await PrayerRequest.find({ isPublic: true })
+      .select("-email")
+      .sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, data: requests });
   } catch (error: any) {

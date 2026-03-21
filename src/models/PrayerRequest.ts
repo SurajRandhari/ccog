@@ -5,6 +5,7 @@ export interface IPrayerRequest extends Document {
   email: string;
   request: string;
   isPublic: boolean;
+  prayingCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,6 +16,7 @@ const prayerRequestSchema = new Schema<IPrayerRequest>(
     email: { type: String, required: true, lowercase: true, trim: true },
     request: { type: String, required: true },
     isPublic: { type: Boolean, default: false },
+    prayingCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,

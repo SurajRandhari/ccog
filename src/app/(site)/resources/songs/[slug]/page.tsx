@@ -1,6 +1,7 @@
 import { Music, ArrowLeft, Bookmark, Share2, Languages, Hash, Tag, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import dbConnect from "@/lib/mongodb";
 import Song from "@/models/Song";
 import { notFound } from "next/navigation";
@@ -102,9 +103,9 @@ export default async function SongDetailsPage({ params }: { params: Promise<{ sl
             <h3 className="font-serif text-2xl font-semibold text-neutral-900 mb-4">Want more songs?</h3>
             <p className="text-neutral-500 mb-8">Explore our full library of hymns and worship songs.</p>
             <Link href="/resources/songs">
-                <Button className="rounded-2xl h-12 px-8 font-semibold shadow-lg shadow-neutral-200">
+                <InteractiveHoverButton className="w-64 bg-white text-neutral-900 border-neutral-100">
                     Back to Song Book
-                </Button>
+                </InteractiveHoverButton>
             </Link>
         </div>
       </section>

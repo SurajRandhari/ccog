@@ -26,9 +26,26 @@ export async function GET(req: NextRequest) {
       query.speaker = speaker;
     }
 
-    const sermons = await Sermon.find(query).sort({ date: -1 });
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const skip = (page - 1) * limit;
 
-    return NextResponse.json({ success: true, data: sermons });
+    const total = await Sermon.countDocuments(query);
+    const sermons = await Sermon.find(query)
+      .sort({ date: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    return NextResponse.json({ 
+      success: true, 
+      data: sermons,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
@@ -51,7 +68,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Either video URL or text content is required" }, { status: 400 });
     }
 
-    const slug = slugify(body.title, { lower: true, strict: true });
+    let slug = slugify(body.title, { lower: true });
+    if (!slug) {
+      slug = `sermon-${Date.now()}`;
+    }
     
     // Ensure createdBy is a valid string ID
     const createdBy = (typeof adminId === 'string' && adminId.length === 24) 

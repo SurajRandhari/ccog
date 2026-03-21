@@ -37,6 +37,7 @@ const resourceLinks = [
   { href: "/resources/devotions", label: "Daily Devotions", description: "Start your day with spiritual encouragement." },
   { href: "/resources/songs", label: "Songs & Lyrics", description: "Browse our library of worship songs." },
   { href: "/resources/blog", label: "Church Blog", description: "Articles and updates from our community." },
+  { href: "/resources/prayer", label: "Prayer Request", description: "Send us your prayer requests and needs." },
   { href: "/resources/downloads", label: "Downloads", description: "Forms, study materials, and other resources." },
 ];
 

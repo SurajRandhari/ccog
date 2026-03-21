@@ -9,13 +9,25 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
-    
-    const sortField = searchParams.get("sort") || "songNumber"; 
+    const isAdmin = req.headers.get("x-user-role") === "admin" || req.headers.get("x-user-role") === "editor";
+    const search = searchParams.get("search") || "";
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const skip = (page - 1) * limit;
+
+    const sortField = searchParams.get("sort") || "songNumber";
     const sortOrder = searchParams.get("order") === "desc" ? -1 : 1;
-    const lang = searchParams.get("lang") || "Hindi"; // Default to Hindi
+    const lang = searchParams.get("lang") || "Hindi";
     const category = searchParams.get("category") || "";
 
-    const query: any = { status: "published" };
+    const query: any = isAdmin ? {} : { status: "published" };
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { lyrics: { $regex: search, $options: "i" } }
+      ];
+    }
 
     if (lang) {
       // Use exact match for language
@@ -35,12 +47,17 @@ export async function GET(req: NextRequest) {
       sortOptions = { songNumber: sortOrder, title: 1 };
     }
 
-    const songs = await Song.find(query).sort(sortOptions);
+    const songs = await Song.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Song.countDocuments(query);
 
     // Get counts for all categories in the current language
     const currentLangCategories = ["Worship", "Praise", "Christmas", "Lent", "Hymn", "Special Songs", "Live"];
     const counts: Record<string, number> = {};
-    
+
     // Total for 'All Library'
     counts["All Library"] = await Song.countDocuments({ language: lang, status: "published" });
     
@@ -57,7 +74,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: songs,
-      counts
+      counts,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit)
+      }
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -80,7 +103,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Title is required" }, { status: 400 });
     }
 
-    const slug = slugify(body.title, { lower: true, strict: true });
+    let slug = slugify(body.title, { lower: true });
+    if (!slug) {
+      slug = `song-${Date.now()}`;
+    }
     
     const song = await Song.create({
       ...body,

@@ -6,7 +6,7 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "dev-secret-key-change-in-production"
 );
 
-export async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const method = request.method;
 
@@ -81,7 +81,7 @@ export async function middleware(request: NextRequest) {
         request: { headers: requestHeaders },
       });
     } catch (error) {
-      console.error("Middleware Auth Error:", error);
+      console.error("Proxy Auth Error:", error);
       if (pathname.startsWith("/api/")) {
         return NextResponse.json({ success: false, message: "Invalid or expired token" }, { status: 401 });
       }

@@ -6,6 +6,7 @@ import { Play, Calendar, User, Search, Loader2, Video, FileText } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -48,7 +49,7 @@ export default function SermonsPageClient() {
   return (
     <div className="bg-white min-h-screen">
       {/* Header */}
-      <section className="relative pt-32 pb-16 lg:pt-48 lg:pb-24 overflow-hidden">
+      <section className="relative pt-12 pb-16 lg:pt-20 lg:pb-24 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,0,0,0.03)_0%,transparent_50%)]" />
         </div>
@@ -117,10 +118,9 @@ export default function SermonsPageClient() {
                         </span>
                     </div>
                     <Link href={`/resources/sermons/${featuredSermon.slug}`}>
-                        <Button size="lg" className="h-16 gap-3 rounded-2xl px-10 bg-white text-neutral-900 hover:bg-neutral-100 shadow-2xl transition-all hover:scale-[1.02]">
-                            {featuredSermon.videoUrl ? <Play className="h-5 w-5 fill-current" /> : <FileText className="h-5 w-5" />}
+                        <InteractiveHoverButton className="w-64 bg-white text-neutral-900 border-none">
                             {featuredSermon.videoUrl ? "Watch Now" : "Read Message"}
-                        </Button>
+                        </InteractiveHoverButton>
                     </Link>
                 </div>
             </motion.div>

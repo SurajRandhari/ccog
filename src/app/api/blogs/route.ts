@@ -66,7 +66,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Title and content are required" }, { status: 400 });
     }
 
-    const slug = body.slug || slugify(body.title, { lower: true, strict: true });
+    let slug = body.slug || slugify(body.title, { lower: true });
+    if (!slug) {
+      slug = `post-${Date.now()}`;
+    }
     
     const blog = await Blog.create({ 
       ...body, 

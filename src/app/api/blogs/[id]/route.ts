@@ -35,7 +35,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
 
     if (body.title && !body.slug) {
-      body.slug = slugify(body.title, { lower: true, strict: true });
+      body.slug = slugify(body.title, { lower: true });
+      if (!body.slug) {
+        body.slug = `post-${Date.now()}`;
+      }
     }
 
     const blog = await Blog.findByIdAndUpdate(id, body, { new: true, runValidators: true });

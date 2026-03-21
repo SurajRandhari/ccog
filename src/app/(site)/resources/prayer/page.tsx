@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Send, Heart, Shield, Globe, Lock, Loader2, CheckCircle2 } from "lucide-react";
+import { MessageSquare, Send, Heart, Shield, Globe, Lock, Loader2, CheckCircle2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -28,6 +30,43 @@ export default function PrayerRequestPage() {
     request: "",
     isPublic: false,
   });
+  const [publicRequests, setPublicRequests] = useState<any[]>([]);
+  const [loadingWall, setLoadingWall] = useState(true);
+
+  useEffect(() => {
+    fetchPublicRequests();
+  }, []);
+
+  const fetchPublicRequests = async () => {
+    try {
+      const res = await fetch("/api/prayer");
+      const data = await res.json();
+      if (data.success) {
+        setPublicRequests(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch public requests", error);
+    } finally {
+      setLoadingWall(false);
+    }
+  };
+
+  const handlePray = async (id: string) => {
+    try {
+      const res = await fetch(`/api/prayer/${id}/pray`, {
+        method: "PATCH",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPublicRequests(prev => 
+          prev.map(req => req._id === id ? { ...req, prayingCount: data.count } : req)
+        );
+        toast.success("Thank you for praying!");
+      }
+    } catch (error) {
+      toast.error("Failed to register prayer");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,12 +114,12 @@ export default function PrayerRequestPage() {
                     May God's peace and grace be with you.
                 </p>
             </div>
-            <Button 
+            <InteractiveHoverButton 
                 onClick={() => setIsSubmitted(false)}
-                className="rounded-2xl h-14 px-10 bg-neutral-900 shadow-xl"
+                className="w-64 bg-neutral-900 text-white border-neutral-800"
             >
                 Submit Another Request
-            </Button>
+            </InteractiveHoverButton>
         </motion.div>
       </div>
     );
@@ -89,7 +128,7 @@ export default function PrayerRequestPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-32 pb-16 lg:pt-48 lg:pb-24">
+      <section className="relative overflow-hidden pt-12 md:pt-20 lg:pt-24 pb-12 lg:pb-16">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,0,0,0.03)_0%,transparent_50%)]" />
         </div>
@@ -115,9 +154,9 @@ export default function PrayerRequestPage() {
       </section>
 
       {/* Form Section */}
-      <section className="py-24 lg:py-32 bg-neutral-50/50 border-t border-neutral-100">
+      <section className="py-16 lg:py-24 bg-neutral-50/50 border-t border-neutral-100">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-20 items-start">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             {/* Left Side: Context */}
             <motion.div
               initial="hidden"
@@ -164,7 +203,7 @@ export default function PrayerRequestPage() {
               viewport={{ once: true }}
               custom={2}
               variants={fadeInUp}
-              className="bg-white p-10 lg:p-14 rounded-[3rem] border border-neutral-200 shadow-2xl shadow-neutral-200/50"
+              className="bg-white p-8 lg:p-10 rounded-[3rem] border border-neutral-200 shadow-2xl shadow-neutral-200/50"
             >
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-6">
@@ -240,6 +279,71 @@ export default function PrayerRequestPage() {
               </form>
             </motion.div>
           </div>
+        </div>
+      </section>
+      
+      {/* Community Prayer Wall */}
+      <section className="py-24 lg:py-32 bg-white overflow-hidden">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="text-center mb-16">
+                <h2 className="font-serif text-4xl font-semibold text-neutral-900 mb-4">Community Prayer Wall</h2>
+                <p className="text-neutral-500 max-w-xl mx-auto font-light">
+                    Join us in intercession. Click the heart to let someone know you are praying for them today.
+                </p>
+            </div>
+
+            {loadingWall ? (
+                <div className="flex justify-center py-20">
+                    <Loader2 className="h-8 w-8 animate-spin text-neutral-200" />
+                </div>
+            ) : publicRequests.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {publicRequests.map((req, i) => (
+                        <motion.div
+                            key={req._id}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            custom={i}
+                            variants={fadeInUp}
+                            className="group p-8 rounded-[2.5rem] border border-neutral-100 bg-neutral-50/50 hover:bg-white hover:shadow-2xl hover:shadow-neutral-200/50 transition-all duration-500"
+                        >
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="h-10 w-10 rounded-full bg-white border border-neutral-100 flex items-center justify-center text-neutral-400">
+                                    <User className="h-5 w-5" />
+                                </div>
+                                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest bg-white px-3 py-1.5 rounded-full border border-neutral-100">
+                                    {new Date(req.createdAt).toLocaleDateString()}
+                                </span>
+                            </div>
+                            <h3 className="font-bold text-neutral-900 mb-4 group-hover:text-rose-600 transition-colors">{req.name}</h3>
+                            <p className="text-neutral-500 leading-relaxed font-light mb-8 line-clamp-4 italic">
+                                "{req.request}"
+                            </p>
+                            <div className="flex items-center justify-between pt-6 border-t border-neutral-100">
+                                <div className="flex items-center gap-2 text-rose-500 font-bold text-sm">
+                                    <Heart className="h-4 w-4 fill-current" />
+                                    <span>{req.prayingCount || 0} Praying</span>
+                                </div>
+                                <Button 
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePray(req._id)}
+                                    className="rounded-full gap-2 border-neutral-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all group/btn active:scale-95"
+                                >
+                                    <Heart className="h-3.5 w-3.5 group-hover/btn:scale-125 transition-transform" />
+                                    Amen
+                                </Button>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center py-20 px-8 rounded-[3rem] border border-dashed border-neutral-200">
+                    <MessageSquare className="h-12 w-12 text-neutral-200 mx-auto mb-4" />
+                    <p className="text-neutral-400 font-light">No public prayer requests yet. Be the first to share one!</p>
+                </div>
+            )}
         </div>
       </section>
     </div>

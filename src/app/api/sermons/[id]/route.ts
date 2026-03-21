@@ -36,7 +36,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
 
     if (body.title) {
-      body.slug = slugify(body.title, { lower: true, strict: true });
+      body.slug = slugify(body.title, { lower: true });
+      if (!body.slug) {
+        body.slug = `sermon-${Date.now()}`;
+      }
     }
 
     const sermon = await Sermon.findByIdAndUpdate(id, body, { new: true, runValidators: true });
