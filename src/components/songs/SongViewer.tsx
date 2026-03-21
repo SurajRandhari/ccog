@@ -27,26 +27,26 @@ export function SongViewer({ song, prevSong, nextSong }: SongViewerProps) {
   return (
     <>
       {/* Hero Header */}
-      <section className="pt-44 pb-20">
+      <section className="pt-32 pb-16">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="flex justify-center mb-10">
+            <div className="flex justify-center mb-8">
               <div className="h-20 w-20 flex items-center justify-center rounded-[2.5rem] bg-white border border-neutral-100 shadow-xl shadow-neutral-100 text-neutral-900">
                 <Music className="h-8 w-8" />
               </div>
             </div>
 
             {song.songNo && (
-              <span className="inline-flex items-center rounded-full bg-neutral-900 px-6 py-2 text-[10px] font-bold text-white uppercase tracking-[0.3em] mb-10 shadow-lg shadow-neutral-900/20">
+              <span className="inline-flex items-center rounded-full bg-neutral-900 px-6 py-2 text-[10px] font-bold text-white uppercase tracking-[0.3em] mb-8 shadow-lg shadow-neutral-900/20">
                 Song No. {song.songNo}
               </span>
             )}
 
-            <h1 className="font-serif text-6xl md:text-8xl font-light tracking-tight text-neutral-900 leading-[1.1] mb-10">
+            <h1 className="font-serif text-6xl md:text-8xl font-light tracking-tight text-neutral-900 leading-[1.1] mb-8">
               {song.title}
             </h1>
 
@@ -81,13 +81,13 @@ export function SongViewer({ song, prevSong, nextSong }: SongViewerProps) {
       </section>
 
       {/* Lyrics Content */}
-      <section className="py-12 relative overflow-hidden">
+      <section className="py-8 relative overflow-hidden">
         <div className="mx-auto max-w-3xl px-6">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative z-10 rounded-[4rem] border border-neutral-100 bg-white p-12 md:p-24 shadow-2xl shadow-neutral-100 overflow-hidden group"
+            className="relative z-10 rounded-[4rem] border border-neutral-100 bg-white p-10 md:p-20 shadow-2xl shadow-neutral-100 overflow-hidden group"
           >
             {/* Visual Accent */}
             <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
@@ -104,7 +104,7 @@ export function SongViewer({ song, prevSong, nextSong }: SongViewerProps) {
 
       {/* Previous / Next Navigation */}
       {(prevSong || nextSong) && (
-        <section className="mt-20 px-6">
+        <section className="mt-12 px-6">
           <div className="mx-auto max-w-3xl grid grid-cols-2 gap-4">
             {prevSong ? (
               <Link

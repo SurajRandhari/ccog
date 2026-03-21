@@ -42,7 +42,7 @@ export default function SongDetailClient({
   nextSong,
 }: SongDetailClientProps) {
   return (
-    <div className="bg-[#fafafa] min-h-screen pb-32 selection:bg-neutral-900 selection:text-white">
+    <div className="bg-[#fafafa] min-h-screen pb-16 selection:bg-neutral-900 selection:text-white">
       {/* Navigation Header */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-100 bg-white/70 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-6 h-20 flex items-center justify-between">
@@ -82,7 +82,7 @@ export default function SongDetailClient({
       />
 
       {/* Footer Navigation */}
-      <section className="mt-40 border-t border-neutral-100 pt-32 pb-40">
+      <section className="mt-20 border-t border-neutral-100 pt-20 pb-24">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <h3 className="font-serif text-4xl font-light text-neutral-900 mb-6 italic">
             Continue the journey
