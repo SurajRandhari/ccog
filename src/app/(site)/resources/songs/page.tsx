@@ -18,12 +18,20 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Globe } from "lucide-react";
 
 interface Song {
   _id: string;
   title: string;
   slug: string;
-  songNo: number;
+  songNo: number | null;
   language: string;
   category: string;
 }
@@ -187,20 +195,47 @@ export default function SongsPage() {
               A curated digital archive of spiritual melodies and sacred lyrics,
               preserved for the community.
             </p>
+          </motion.div>
+        </div>
+      </section>
 
-            {/* Glassmorphic Search Bar with Autocomplete */}
-            <div className="pt-12 max-w-2xl mx-auto" ref={searchRef}>
-              <div className="relative group">
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30 group-focus-within:text-blue-300 transition-colors z-10" />
+      {/* Filter & Content Section */}
+      <section className="relative z-20 -mt-20 pb-32">
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Controls Bar */}
+          <div className="bg-white rounded-[2.5rem] p-6 shadow-xl shadow-neutral-200/50 border border-neutral-100 mb-10 space-y-6">
+            <div className="flex flex-col lg:flex-row gap-6 items-center border-b border-neutral-50 pb-6">
+              {/* Language Selection Dropdown */}
+              <div className="flex items-center gap-3 w-full lg:w-fit shrink-0">
+                <div className="h-10 w-10 rounded-xl bg-neutral-50 flex items-center justify-center text-neutral-400">
+                  <Globe className="h-5 w-5" />
+                </div>
+                <Select value={activeLang} onValueChange={(val) => setActiveLang(val || "Hindi")}>
+                  <SelectTrigger className="w-full lg:w-[150px] h-12 rounded-xl border-neutral-100 bg-neutral-50/50 font-bold uppercase tracking-widest text-[10px]">
+                    <SelectValue placeholder="Language" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-neutral-100">
+                    {LANGUAGES.map((lang) => (
+                      <SelectItem key={lang} value={lang} className="uppercase text-[10px] font-bold tracking-widest">
+                        {lang}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Integrated Search Input (Middle) */}
+              <div className="relative flex-1 w-full lg:max-w-2xl mx-auto" ref={searchRef}>
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-300 pointer-events-none" />
                 <Input
-                  placeholder="Find a song by title, lyrics, or number..."
+                  placeholder="Find songs by title, lyrics, or song number..."
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value);
                     setShowSuggestions(true);
                   }}
                   onFocus={() => setShowSuggestions(true)}
-                  className="h-20 pl-16 pr-8 rounded-3xl border-white/10 bg-white/5 backdrop-blur-2xl text-white placeholder:text-white/20 focus:bg-white/10 transition-all shadow-2xl focus:ring-1 focus:ring-white/20 text-xl font-serif font-light"
+                  className="h-12 pl-11 pr-4 rounded-xl border-neutral-100 bg-neutral-50/50 focus:bg-white text-sm transition-all focus:ring-1 focus:ring-neutral-200"
                 />
 
                 {/* Suggestion Dropdown */}
@@ -213,7 +248,7 @@ export default function SongsPage() {
                         className="flex items-center gap-4 px-6 py-4 hover:bg-neutral-50 transition-colors"
                         onClick={() => setShowSuggestions(false)}
                       >
-                        <div className="h-9 w-9 rounded-xl bg-neutral-100 flex items-center justify-center text-xs font-mono font-bold text-neutral-400 shrink-0">
+                        <div className="h-8 w-8 rounded-lg bg-neutral-100 flex items-center justify-center text-[10px] font-mono font-bold text-neutral-400 shrink-0">
                           {s.songNo
                             ? s.songNo.toString().padStart(3, "0")
                             : "—"}
@@ -226,53 +261,33 @@ export default function SongsPage() {
                   </div>
                 )}
               </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
-      {/* Filter & Content Section */}
-      <section className="relative z-20 -mt-16 pb-32">
-        <div className="max-w-7xl mx-auto px-6">
-          {/* Controls Bar */}
-          <div className="bg-white rounded-[2.5rem] p-4 shadow-xl shadow-neutral-200/50 border border-neutral-100 mb-10 flex flex-col lg:flex-row gap-4 items-center justify-between">
-            {/* Language Selection */}
-            <div className="flex items-center gap-1 p-1.5 bg-neutral-50 rounded-2xl w-full lg:w-fit">
-              {LANGUAGES.map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => setActiveLang(lang)}
-                  className={cn(
-                    "relative px-8 py-3 rounded-xl text-xs font-bold tracking-widest transition-all duration-300 flex-1 lg:flex-none uppercase",
-                    activeLang === lang
-                      ? "text-neutral-900"
-                      : "text-neutral-400 hover:text-neutral-600"
-                  )}
-                >
-                  {activeLang === lang && (
-                    <motion.div
-                      layoutId="activeLang"
-                      className="absolute inset-0 bg-white shadow-sm border border-neutral-100 rounded-xl"
-                      transition={{
-                        type: "spring",
-                        bounce: 0.1,
-                        duration: 0.6,
-                      }}
-                    />
-                  )}
-                  <span className="relative z-10">{lang}</span>
-                </button>
-              ))}
+              {/* Sort Dropdown */}
+              <div className="flex items-center gap-3 w-full lg:w-fit shrink-0">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 whitespace-nowrap">Sort:</span>
+                <Select value={sortOption} onValueChange={(val) => setSortOption(val || "songNo-asc")}>
+                  <SelectTrigger className="w-full lg:w-[150px] h-12 rounded-xl border-neutral-100 bg-neutral-50/50 font-bold uppercase tracking-widest text-[10px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-neutral-100">
+                    {SORT_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value} className="uppercase text-[10px] font-bold tracking-widest">
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            {/* Category + Sort */}
-            <div className="flex gap-2 items-center overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 no-scrollbar">
+            {/* Category Tabs */}
+            <div className="flex gap-2 items-center overflow-x-auto w-full pb-2 no-scrollbar">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={cn(
-                    "group flex items-center gap-3 px-5 py-3 rounded-2xl text-[10px] uppercase font-bold tracking-widest transition-all border shrink-0",
+                    "group flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] uppercase font-bold tracking-widest transition-all border shrink-0",
                     activeCategory === cat
                       ? "bg-neutral-900 text-white border-neutral-900 shadow-lg"
                       : "bg-white text-neutral-400 border-neutral-50 hover:border-neutral-200 hover:text-neutral-600"
@@ -291,21 +306,6 @@ export default function SongsPage() {
                   </span>
                 </button>
               ))}
-
-              {/* Sort Dropdown */}
-              <div className="flex items-center gap-1 ml-2 shrink-0">
-                <select
-                  value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value)}
-                  className="h-10 px-3 rounded-xl border border-neutral-100 bg-white text-[10px] font-bold uppercase tracking-widest text-neutral-400 cursor-pointer focus:outline-none focus:ring-1 focus:ring-neutral-200"
-                >
-                  {SORT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
           </div>
 

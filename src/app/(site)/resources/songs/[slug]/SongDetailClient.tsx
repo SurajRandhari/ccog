@@ -24,7 +24,7 @@ interface NavSong {
 interface SongDetailClientProps {
   song: {
     title: string;
-    songNo?: number;
+    songNo: number | null;
     category: string;
     language: string;
     lyrics: string;

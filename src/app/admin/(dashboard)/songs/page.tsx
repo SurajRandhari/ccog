@@ -232,7 +232,7 @@ export default function SongsAdminPage() {
 
           <div className="flex items-center gap-2 flex-wrap">
             {/* Language Filter */}
-            <Select value={langFilter} onValueChange={setLangFilter}>
+            <Select value={langFilter} onValueChange={(val) => setLangFilter(val || "All")}>
               <SelectTrigger className="h-10 w-[130px] rounded-xl border-neutral-200 bg-white text-xs font-medium">
                 <Globe className="h-3 w-3 mr-1 text-neutral-400" />
                 <SelectValue />
@@ -247,7 +247,7 @@ export default function SongsAdminPage() {
             </Select>
 
             {/* Category Filter */}
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select value={categoryFilter} onValueChange={(val) => setCategoryFilter(val || "All")}>
               <SelectTrigger className="h-10 w-[140px] rounded-xl border-neutral-200 bg-white text-xs font-medium">
                 <Filter className="h-3 w-3 mr-1 text-neutral-400" />
                 <SelectValue />
@@ -262,7 +262,7 @@ export default function SongsAdminPage() {
             </Select>
 
             {/* Published Filter */}
-            <Select value={publishedFilter} onValueChange={setPublishedFilter}>
+            <Select value={publishedFilter} onValueChange={(val) => setPublishedFilter(val || "all")}>
               <SelectTrigger className="h-10 w-[130px] rounded-xl border-neutral-200 bg-white text-xs font-medium">
                 <SelectValue />
               </SelectTrigger>
@@ -404,38 +404,44 @@ export default function SongsAdminPage() {
                     </td>
                     <td className="px-5 py-3.5 text-right">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-full"
-                          >
-                            <MoreVertical className="h-4 w-4 text-neutral-400" />
-                          </Button>
-                        </DropdownMenuTrigger>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-full"
+                            >
+                              <MoreVertical className="h-4 w-4 text-neutral-400" />
+                            </Button>
+                          }
+                        />
                         <DropdownMenuContent
                           align="end"
                           className="w-44 rounded-xl shadow-xl border-neutral-200"
                         >
                           {song.status !== "deleted" && (
                             <>
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  href={`/admin/songs/${song._id}`}
-                                  className="cursor-pointer gap-2"
-                                >
-                                  <Edit2 className="h-4 w-4" /> Edit
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  href={`/resources/songs/${song.slug}`}
-                                  target="_blank"
-                                  className="cursor-pointer gap-2"
-                                >
-                                  <Eye className="h-4 w-4" /> Preview
-                                </Link>
-                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                render={
+                                  <Link
+                                    href={`/admin/songs/${song._id}`}
+                                    className="cursor-pointer gap-2 text-sm"
+                                  >
+                                    <Edit2 className="h-4 w-4" /> Edit
+                                  </Link>
+                                }
+                              />
+                              <DropdownMenuItem
+                                render={
+                                  <Link
+                                    href={`/resources/songs/${song.slug}`}
+                                    target="_blank"
+                                    className="cursor-pointer gap-2 text-sm"
+                                  >
+                                    <Eye className="h-4 w-4" /> Preview
+                                  </Link>
+                                }
+                              />
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onClick={() => handleTogglePublish(song._id)}

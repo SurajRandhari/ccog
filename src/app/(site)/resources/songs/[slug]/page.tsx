@@ -55,7 +55,7 @@ export default async function SongDetailsPage({
   // Convert Mongoose doc to plain object for Client Component
   const songData = {
     title: song.title,
-    songNo: song.songNo ?? undefined,
+    songNo: song.songNo,
     category: song.category,
     language: song.language,
     lyrics: song.lyrics,

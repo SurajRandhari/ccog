@@ -267,11 +267,13 @@ export default function DevotionsAdminPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                            <MoreVertical className="h-4 w-4 text-neutral-400" />
-                          </Button>
-                        </DropdownMenuTrigger>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                              <MoreVertical className="h-4 w-4 text-neutral-400" />
+                            </Button>
+                          }
+                        />
                         <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-xl border-neutral-200">
                           <DropdownMenuItem onClick={() => handleOpenEdit(devotion)} className="cursor-pointer gap-2">
                              <Edit2 className="h-4 w-4" /> Edit
