@@ -385,14 +385,18 @@ export default function SongsAdminPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Category</Label>
-                  <Select value={formData.category || "worship"} onValueChange={(v: string | null) => setFormData({...formData, category: v || "worship"})}>
+                  <Select value={formData.category || "Worship"} onValueChange={(v: string | null) => setFormData({...formData, category: v || "Worship"})}>
                     <SelectTrigger className="rounded-xl border-neutral-200">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl shadow-xl">
-                      <SelectItem value="worship">Worship</SelectItem>
-                      <SelectItem value="praise">Praise</SelectItem>
-                      <SelectItem value="traditional">Traditional</SelectItem>
+                      <SelectItem value="Worship">Worship</SelectItem>
+                      <SelectItem value="Praise">Praise</SelectItem>
+                      <SelectItem value="Christmas">Christmas</SelectItem>
+                      <SelectItem value="Lent">Lent</SelectItem>
+                      <SelectItem value="Hymn">Hymn</SelectItem>
+                      <SelectItem value="Special Songs">Special Songs</SelectItem>
+                      <SelectItem value="Live">Live</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

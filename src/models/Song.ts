@@ -6,7 +6,7 @@ export interface ISong extends Document {
   songNumber?: number | null;
   lyrics: string;
   language: "Hindi" | "English" | "Odia";
-  category: "worship" | "praise" | "traditional";
+  category: "Worship" | "Praise" | "Christmas" | "Lent" | "Hymn" | "Special Songs" | "Live";
   status: "draft" | "published";
   isLive?: boolean;
   tags: string[];
