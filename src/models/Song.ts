@@ -57,6 +57,7 @@ songSchema.index({ slug: 1 }, { unique: true });
 
 // Performance indexes
 songSchema.index({ songNo: 1 });
+songSchema.index({ language: 1, category: 1, status: 1, isPublished: 1 });
 songSchema.index({ status: 1, isPublished: 1 });
 songSchema.index({ language: 1 });
 songSchema.index({ category: 1 });

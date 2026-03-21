@@ -22,8 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import Editor from "./Editor";
 import { toast } from "sonner";
+import Editor from "../Editor";
 
 interface SongFormProps {
   initialData?: any;

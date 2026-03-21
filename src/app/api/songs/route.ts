@@ -79,6 +79,7 @@ export async function GET(req: NextRequest) {
     }
 
     const songs = await Song.find(query)
+      .select("songNo title slug language category status isPublished createdAt")
       .sort(sortOptions)
       .skip(skip)
       .limit(limit);

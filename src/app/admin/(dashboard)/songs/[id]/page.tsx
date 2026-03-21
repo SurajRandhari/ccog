@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SongForm from "@/components/admin/SongForm";
+import SongForm from "@/components/admin/songs/SongForm";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";

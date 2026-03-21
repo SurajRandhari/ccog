@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/mongodb";
 import Song from "@/models/Song";
 import { notFound } from "next/navigation";
 import SongDetailClient from "./SongDetailClient";
+import { isValidObjectId } from "mongoose";
 
 export default async function SongDetailsPage({
   params,
@@ -11,11 +12,15 @@ export default async function SongDetailsPage({
   const { slug } = await params;
   await connectDB();
 
-  const song = await Song.findOne({
-    slug: slug,
-    status: "active",
-    isPublished: true,
-  });
+  const query: any = { status: "active", isPublished: true };
+  
+  if (isValidObjectId(slug)) {
+    query.$or = [{ slug: slug }, { _id: slug }];
+  } else {
+    query.slug = slug;
+  }
+
+  const song = await Song.findOne(query);
 
   if (!song) {
     notFound();
