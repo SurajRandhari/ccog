@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import SongForm from "@/components/admin/SongForm";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export default function EditSongPage() {
   const params = useParams();
@@ -13,12 +14,12 @@ export default function EditSongPage() {
   useEffect(() => {
     async function fetchSong() {
       try {
-        const res = await fetch(`/api/v1/admin/songs/${params.id}`);
+        const res = await fetch(`/api/songs/${params.id}`);
         const data = await res.json();
         if (data.success) {
           setSong(data.data);
         } else {
-          toast.error(data.error.message);
+          toast.error(data.message || "Song not found");
         }
       } catch (error) {
         toast.error("Failed to fetch song");
@@ -34,8 +35,8 @@ export default function EditSongPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[400px] items-center justify-center text-neutral-400">
-        Loading song data...
+      <div className="flex h-[400px] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-neutral-400" />
       </div>
     );
   }

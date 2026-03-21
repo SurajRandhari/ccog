@@ -1,10 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Music, ChevronRight, Zap, Tag } from "lucide-react";
+import {
+  Search,
+  Music,
+  ChevronRight,
+  ChevronLeft,
+  Tag,
+  ArrowUpDown,
+  SortAsc,
+  SortDesc,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -13,9 +23,15 @@ interface Song {
   _id: string;
   title: string;
   slug: string;
-  songNumber: number;
+  songNo: number;
   language: string;
   category: string;
+}
+
+interface Suggestion {
+  title: string;
+  slug: string;
+  songNo: number | null;
 }
 
 const LANGUAGES = ["Hindi", "English", "Odia"];
@@ -27,7 +43,13 @@ const CATEGORIES = [
   "Lent",
   "Hymn",
   "Special Songs",
-  "Live"
+];
+
+const SORT_OPTIONS = [
+  { label: "Song No ↑", value: "songNo-asc" },
+  { label: "Song No ↓", value: "songNo-desc" },
+  { label: "A → Z", value: "title-asc" },
+  { label: "Z → A", value: "title-desc" },
 ];
 
 export default function SongsPage() {
@@ -37,22 +59,57 @@ export default function SongsPage() {
   const [search, setSearch] = useState("");
   const [activeLang, setActiveLang] = useState("Hindi");
   const [activeCategory, setActiveCategory] = useState("All Library");
-  const debouncedSearch = useDebounce(search, 300);
+  const [sortOption, setSortOption] = useState("songNo-asc");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  // Reset category when language changes
+  // Suggestions
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSuggestionSearch = useDebounce(search, 300);
+
+  const LIMIT = 20;
+
+  // Reset category & page when language changes
   useEffect(() => {
     setActiveCategory("All Library");
+    setPage(1);
   }, [activeLang]);
 
+  // Reset page on filter/search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, activeCategory, sortOption]);
+
+  // Fetch songs
   useEffect(() => {
     const fetchSongs = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/songs?search=${debouncedSearch}&lang=${activeLang}&category=${activeCategory}`);
+        const [sortField, sortOrder] = sortOption.split("-");
+        const params = new URLSearchParams({
+          search: debouncedSearch,
+          lang: activeLang,
+          category: activeCategory,
+          sort: sortField,
+          order: sortOrder,
+          page: page.toString(),
+          limit: LIMIT.toString(),
+        });
+
+        const res = await fetch(`/api/songs?${params.toString()}`);
         const data = await res.json();
         if (data.success) {
           setSongs(data.data);
           setCounts(data.counts || {});
+          if (data.pagination) {
+            setTotalPages(data.pagination.pages);
+            setTotal(data.pagination.total);
+          }
         }
       } catch (error) {
         console.error("Failed to fetch songs");
@@ -62,52 +119,115 @@ export default function SongsPage() {
     };
 
     fetchSongs();
-  }, [debouncedSearch, activeLang, activeCategory]);
+  }, [debouncedSearch, activeLang, activeCategory, sortOption, page]);
+
+  // Fetch suggestions
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!debouncedSuggestionSearch || debouncedSuggestionSearch.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+      try {
+        const res = await fetch(
+          `/api/songs/suggestions?q=${encodeURIComponent(debouncedSuggestionSearch)}`
+        );
+        const data = await res.json();
+        if (data.success) {
+          setSuggestions(data.data);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    fetchSuggestions();
+  }, [debouncedSuggestionSearch]);
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#fafafa] selection:bg-neutral-900 selection:text-white">
       {/* Hero Banner Section */}
       <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-        {/* Background Image with Parallax & Overlay */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/images/site/songs-hero.png" 
-            alt="Library Background" 
+          <img
+            src="/images/site/songs-hero.png"
+            alt="Library Background"
             className="w-full h-full object-cover scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/80 via-neutral-950/40 to-[#fafafa]" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="space-y-6"
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="space-y-6"
+          >
+            <Badge
+              variant="outline"
+              className="rounded-full px-6 py-2 text-[10px] uppercase font-bold tracking-[0.3em] border-white/20 text-white/60 backdrop-blur-md bg-white/5"
             >
-                <Badge variant="outline" className="rounded-full px-6 py-2 text-[10px] uppercase font-bold tracking-[0.3em] border-white/20 text-white/60 backdrop-blur-md bg-white/5">
-                    Sacred Collection
-                </Badge>
-                <h1 className="text-6xl md:text-8xl font-serif font-light tracking-tight leading-tight text-white">
-                    The <span className="italic font-normal text-blue-200">Hymnal</span>
-                </h1>
-                <p className="text-xl text-white/60 max-w-2xl mx-auto font-light leading-relaxed">
-                    A curated digital archive of spiritual melodies and sacred lyrics, preserved for the community.
-                </p>
-                
-                {/* Glassmorphic Search Bar */}
-                <div className="pt-12 max-w-2xl mx-auto">
-                    <div className="relative group">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30 group-focus-within:text-blue-300 transition-colors" />
-                        <Input 
-                            placeholder="Find a song by title or lyrics..." 
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="h-20 pl-16 pr-8 rounded-3xl border-white/10 bg-white/5 backdrop-blur-2xl text-white placeholder:text-white/20 focus:bg-white/10 transition-all shadow-2xl focus:ring-1 focus:ring-white/20 text-xl font-serif font-light"
-                        />
-                    </div>
-                </div>
-            </motion.div>
+              Sacred Collection
+            </Badge>
+            <h1 className="text-6xl md:text-8xl font-serif font-light tracking-tight leading-tight text-white">
+              The <span className="italic font-normal text-blue-200">Hymnal</span>
+            </h1>
+            <p className="text-xl text-white/60 max-w-2xl mx-auto font-light leading-relaxed">
+              A curated digital archive of spiritual melodies and sacred lyrics,
+              preserved for the community.
+            </p>
+
+            {/* Glassmorphic Search Bar with Autocomplete */}
+            <div className="pt-12 max-w-2xl mx-auto" ref={searchRef}>
+              <div className="relative group">
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-white/30 group-focus-within:text-blue-300 transition-colors z-10" />
+                <Input
+                  placeholder="Find a song by title, lyrics, or number..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  className="h-20 pl-16 pr-8 rounded-3xl border-white/10 bg-white/5 backdrop-blur-2xl text-white placeholder:text-white/20 focus:bg-white/10 transition-all shadow-2xl focus:ring-1 focus:ring-white/20 text-xl font-serif font-light"
+                />
+
+                {/* Suggestion Dropdown */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-neutral-100 overflow-hidden z-50 max-h-[300px] overflow-y-auto">
+                    {suggestions.map((s, i) => (
+                      <Link
+                        key={i}
+                        href={`/resources/songs/${s.slug}`}
+                        className="flex items-center gap-4 px-6 py-4 hover:bg-neutral-50 transition-colors"
+                        onClick={() => setShowSuggestions(false)}
+                      >
+                        <div className="h-9 w-9 rounded-xl bg-neutral-100 flex items-center justify-center text-xs font-mono font-bold text-neutral-400 shrink-0">
+                          {s.songNo
+                            ? s.songNo.toString().padStart(3, "0")
+                            : "—"}
+                        </div>
+                        <span className="text-sm font-medium text-neutral-900 truncate">
+                          {s.title}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -115,7 +235,7 @@ export default function SongsPage() {
       <section className="relative z-20 -mt-16 pb-32">
         <div className="max-w-7xl mx-auto px-6">
           {/* Controls Bar */}
-          <div className="bg-white rounded-[2.5rem] p-4 shadow-xl shadow-neutral-200/50 border border-neutral-100 mb-16 flex flex-col lg:flex-row gap-6 items-center justify-between">
+          <div className="bg-white rounded-[2.5rem] p-4 shadow-xl shadow-neutral-200/50 border border-neutral-100 mb-10 flex flex-col lg:flex-row gap-4 items-center justify-between">
             {/* Language Selection */}
             <div className="flex items-center gap-1 p-1.5 bg-neutral-50 rounded-2xl w-full lg:w-fit">
               {LANGUAGES.map((lang) => (
@@ -124,8 +244,8 @@ export default function SongsPage() {
                   onClick={() => setActiveLang(lang)}
                   className={cn(
                     "relative px-8 py-3 rounded-xl text-xs font-bold tracking-widest transition-all duration-300 flex-1 lg:flex-none uppercase",
-                    activeLang === lang 
-                      ? "text-neutral-900" 
+                    activeLang === lang
+                      ? "text-neutral-900"
                       : "text-neutral-400 hover:text-neutral-600"
                   )}
                 >
@@ -133,7 +253,11 @@ export default function SongsPage() {
                     <motion.div
                       layoutId="activeLang"
                       className="absolute inset-0 bg-white shadow-sm border border-neutral-100 rounded-xl"
-                      transition={{ type: "spring", bounce: 0.1, duration: 0.6 }}
+                      transition={{
+                        type: "spring",
+                        bounce: 0.1,
+                        duration: 0.6,
+                      }}
                     />
                   )}
                   <span className="relative z-10">{lang}</span>
@@ -141,29 +265,47 @@ export default function SongsPage() {
               ))}
             </div>
 
-            {/* Category Filter */}
-            <div className="flex gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 scrollbar-hide no-scrollbar">
-                {CATEGORIES.map((cat) => (
-                    <button
-                        key={cat}
-                        onClick={() => setActiveCategory(cat)}
-                        className={cn(
-                            "group flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] uppercase font-bold tracking-widest transition-all border shrink-0",
-                            activeCategory === cat 
-                                ? "bg-neutral-900 text-white border-neutral-900 shadow-lg" 
-                                : "bg-white text-neutral-400 border-neutral-50 hover:border-neutral-200 hover:text-neutral-600"
-                        )}
-                    >
-                        {cat === "Live" && <Zap className={cn("h-3 w-3", activeCategory === "Live" ? "text-amber-400" : "text-amber-500")} />}
-                        {cat}
-                        <span className={cn(
-                            "px-2 py-0.5 rounded-md text-[9px] font-bold",
-                            activeCategory === cat ? "bg-white/10 text-white/50" : "bg-neutral-50 text-neutral-300"
-                        )}>
-                            {counts[cat] || 0}
-                        </span>
-                    </button>
-                ))}
+            {/* Category + Sort */}
+            <div className="flex gap-2 items-center overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 no-scrollbar">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={cn(
+                    "group flex items-center gap-3 px-5 py-3 rounded-2xl text-[10px] uppercase font-bold tracking-widest transition-all border shrink-0",
+                    activeCategory === cat
+                      ? "bg-neutral-900 text-white border-neutral-900 shadow-lg"
+                      : "bg-white text-neutral-400 border-neutral-50 hover:border-neutral-200 hover:text-neutral-600"
+                  )}
+                >
+                  {cat}
+                  <span
+                    className={cn(
+                      "px-2 py-0.5 rounded-md text-[9px] font-bold",
+                      activeCategory === cat
+                        ? "bg-white/10 text-white/50"
+                        : "bg-neutral-50 text-neutral-300"
+                    )}
+                  >
+                    {counts[cat] || 0}
+                  </span>
+                </button>
+              ))}
+
+              {/* Sort Dropdown */}
+              <div className="flex items-center gap-1 ml-2 shrink-0">
+                <select
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                  className="h-10 px-3 rounded-xl border border-neutral-100 bg-white text-[10px] font-bold uppercase tracking-widest text-neutral-400 cursor-pointer focus:outline-none focus:ring-1 focus:ring-neutral-200"
+                >
+                  {SORT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -171,7 +313,10 @@ export default function SongsPage() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-44 rounded-[3rem] bg-white animate-pulse border border-neutral-100" />
+                <div
+                  key={i}
+                  className="h-44 rounded-[3rem] bg-white animate-pulse border border-neutral-100"
+                />
               ))}
             </div>
           ) : (
@@ -184,36 +329,47 @@ export default function SongsPage() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.5, delay: i * 0.03, ease: [0.23, 1, 0.32, 1] }}
+                      transition={{
+                        duration: 0.5,
+                        delay: i * 0.03,
+                        ease: [0.23, 1, 0.32, 1],
+                      }}
                     >
-                      <Link 
+                      <Link
                         href={`/resources/songs/${song.slug}`}
                         className="group flex flex-col gap-6 p-8 rounded-[3rem] bg-white hover:bg-neutral-950 transition-all duration-500 border border-neutral-100 hover:border-neutral-900 shadow-sm hover:shadow-2xl hover:shadow-neutral-900/20 relative overflow-hidden h-full"
                       >
                         <div className="flex justify-between items-start relative z-10">
-                            <div className="w-14 h-14 rounded-2xl bg-neutral-50 group-hover:bg-white/10 flex items-center justify-center font-mono text-lg font-bold text-neutral-300 group-hover:text-blue-300 transition-colors border border-neutral-100 group-hover:border-white/10">
-                                {song.songNumber?.toString().padStart(3, "0") || '---'}
-                            </div>
-                            <Badge variant="outline" className="rounded-full px-3 py-1 text-[9px] uppercase font-bold tracking-widest border-neutral-100 group-hover:border-white/10 text-neutral-400 group-hover:text-white/40">
-                                {song.language}
-                            </Badge>
+                          <div className="w-14 h-14 rounded-2xl bg-neutral-50 group-hover:bg-white/10 flex items-center justify-center font-mono text-lg font-bold text-neutral-300 group-hover:text-blue-300 transition-colors border border-neutral-100 group-hover:border-white/10">
+                            {song.songNo
+                              ?.toString()
+                              .padStart(3, "0") || "---"}
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className="rounded-full px-3 py-1 text-[9px] uppercase font-bold tracking-widest border-neutral-100 group-hover:border-white/10 text-neutral-400 group-hover:text-white/40"
+                          >
+                            {song.language}
+                          </Badge>
                         </div>
-                        
+
                         <div className="space-y-3 relative z-10">
-                            <h3 className="text-2xl font-serif font-light tracking-tight text-neutral-900 group-hover:text-white transition-colors leading-snug">
-                                {song.title}
-                            </h3>
-                            <div className="flex items-center gap-2">
-                                <Tag className="h-3 w-3 text-neutral-300 group-hover:text-white/20" />
-                                <span className="text-[10px] font-bold text-neutral-400 group-hover:text-white/40 uppercase tracking-[0.2em]">{song.category}</span>
-                            </div>
+                          <h3 className="text-2xl font-serif font-light tracking-tight text-neutral-900 group-hover:text-white transition-colors leading-snug">
+                            {song.title}
+                          </h3>
+                          <div className="flex items-center gap-2">
+                            <Tag className="h-3 w-3 text-neutral-300 group-hover:text-white/20" />
+                            <span className="text-[10px] font-bold text-neutral-400 group-hover:text-white/40 uppercase tracking-[0.2em]">
+                              {song.category}
+                            </span>
+                          </div>
                         </div>
 
                         <div className="mt-4 pt-6 border-t border-neutral-50 group-hover:border-white/5 flex items-center justify-between relative z-10">
-                            <span className="text-xs font-medium text-neutral-400 group-hover:text-white/30 flex items-center gap-2">
-                                <Music className="h-3 w-3" /> View Lyrics
-                            </span>
-                            <ChevronRight className="h-5 w-5 text-neutral-200 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                          <span className="text-xs font-medium text-neutral-400 group-hover:text-white/30 flex items-center gap-2">
+                            <Music className="h-3 w-3" /> View Lyrics
+                          </span>
+                          <ChevronRight className="h-5 w-5 text-neutral-200 group-hover:text-white group-hover:translate-x-1 transition-all" />
                         </div>
 
                         {/* Background Ornament */}
@@ -226,13 +382,43 @@ export default function SongsPage() {
                     <div className="w-24 h-24 rounded-[3rem] bg-white shadow-xl shadow-neutral-100 flex items-center justify-center mb-8 border border-neutral-50">
                       <Music className="h-10 w-10 text-neutral-200" />
                     </div>
-                    <h2 className="text-4xl font-serif font-light text-neutral-900 mb-4 italic">No Songs Found</h2>
+                    <h2 className="text-4xl font-serif font-light text-neutral-900 mb-4 italic">
+                      No Songs Found
+                    </h2>
                     <p className="text-lg text-neutral-500 font-light max-w-sm leading-relaxed">
-                        We couldn't find any sacred songs matching <span className="text-neutral-900 font-medium">"{activeCategory}"</span> in the current collection.
+                      We couldn&apos;t find any songs matching your search in this
+                      collection.
                     </p>
                   </div>
                 )}
               </AnimatePresence>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4 mt-16">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="rounded-xl h-11 px-5 gap-2 border-neutral-200"
+              >
+                <ChevronLeft className="h-4 w-4" /> Previous
+              </Button>
+              <span className="text-sm font-medium text-neutral-500">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="rounded-xl h-11 px-5 gap-2 border-neutral-200"
+              >
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
           )}
         </div>

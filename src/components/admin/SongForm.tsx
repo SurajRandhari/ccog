@@ -1,34 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { 
-  Save, 
-  X, 
+import {
+  Save,
   ArrowLeft,
   Settings,
   Globe,
-  Tag as TagIcon,
-  Layout,
-  Type
+  Type,
+  User,
 } from "lucide-react";
-import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import Editor from "./Editor";
 import { toast } from "sonner";
-import { SongInput } from "@/lib/validations/song";
 
 interface SongFormProps {
   initialData?: any;
@@ -40,30 +35,44 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
-    songNumber: initialData?.songNumber || "",
+    songNo: initialData?.songNo ?? initialData?.songNumber ?? "",
     lyrics: initialData?.lyrics || "",
-    category: initialData?.category || "hymn",
+    category: initialData?.category || "Worship",
     language: initialData?.language || "English",
-    tags: initialData?.tags || [],
-    status: initialData?.status || "published",
-    isLive: initialData?.isLive || false,
+    author: initialData?.author || "",
+    isPublished: initialData?.isPublished ?? false,
+    status: initialData?.status || "active",
   });
 
-  const [tagInput, setTagInput] = useState("");
+  const [autoSlug, setAutoSlug] = useState("");
+
+  // Auto-generate slug when title changes
+  useEffect(() => {
+    if (formData.title) {
+      const slug = formData.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .trim();
+      setAutoSlug(slug);
+    } else {
+      setAutoSlug("");
+    }
+  }, [formData.title]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const url = isEditing 
-        ? `/api/songs/${initialData._id}` 
+      const url = isEditing
+        ? `/api/songs/${initialData._id}`
         : "/api/songs";
       const method = isEditing ? "PUT" : "POST";
 
-      // Ensure songNumber is a number
       const payload = {
         ...formData,
-        songNumber: formData.songNumber ? Number(formData.songNumber) : null
+        songNo: formData.songNo ? Number(formData.songNo) : null,
       };
 
       const res = await fetch(url, {
@@ -74,7 +83,9 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
 
       const data = await res.json();
       if (data.success) {
-        toast.success(isEditing ? "Song updated successfully" : "Song created successfully");
+        toast.success(
+          isEditing ? "Song updated successfully" : "Song created successfully"
+        );
         router.push("/admin/songs");
         router.refresh();
       } else {
@@ -85,17 +96,6 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const addTag = () => {
-    if (tagInput && !formData.tags.includes(tagInput)) {
-      setFormData({ ...formData, tags: [...formData.tags, tagInput] });
-      setTagInput("");
-    }
-  };
-
-  const removeTag = (tag: string) => {
-    setFormData({ ...formData, tags: formData.tags.filter((t: string) => t !== tag) });
   };
 
   return (
@@ -113,10 +113,12 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
           </Button>
           <div>
             <h1 className="font-serif text-3xl font-bold text-neutral-900 leading-tight">
-              {isEditing ? "Edit Song" : "Add Song Book"}
+              {isEditing ? "Edit Song" : "Add New Song"}
             </h1>
             <p className="mt-1 text-sm text-neutral-500 font-light">
-              Create a premium digital hymn book entry.
+              {isEditing
+                ? "Update song details and lyrics."
+                : "Create a new song entry for the hymn book."}
             </p>
           </div>
         </div>
@@ -134,16 +136,26 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
             disabled={loading}
             className="rounded-xl h-12 px-6 gap-2 bg-neutral-900 shadow-xl shadow-neutral-200"
           >
-            {loading ? "Saving..." : <><Save className="h-4 w-4" /> Save Entry</>}
+            {loading ? (
+              "Saving..."
+            ) : (
+              <>
+                <Save className="h-4 w-4" /> Save Entry
+              </>
+            )}
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 px-6 lg:px-0">
+        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           <div className="rounded-[2.5rem] border border-neutral-100 bg-white p-10 shadow-sm space-y-8">
             <div className="space-y-3">
-              <Label htmlFor="title" className="text-xs font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+              <Label
+                htmlFor="title"
+                className="text-xs font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2"
+              >
                 <Type className="h-3 w-3" />
                 Song Title
               </Label>
@@ -152,25 +164,38 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
                 required
                 placeholder="Amazing Grace..."
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
                 className="h-14 rounded-2xl border-neutral-100 bg-neutral-50/50 focus:bg-white text-lg font-medium transition-all"
               />
+              {autoSlug && (
+                <p className="text-xs text-neutral-400 pl-1">
+                  Slug: <span className="font-mono text-neutral-500">{autoSlug}</span>
+                </p>
+              )}
             </div>
 
             <div className="space-y-3">
               <Label className="text-xs font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2">
                 Lyrics Content
               </Label>
+              <p className="text-[11px] text-neutral-400">
+                Use headings for sections (Verse, Chorus, Bridge) for future presentation mode.
+              </p>
               <div className="rounded-2xl border border-neutral-100 overflow-hidden">
                 <Editor
                   content={formData.lyrics}
-                  onChange={(content) => setFormData({ ...formData, lyrics: content })}
+                  onChange={(content) =>
+                    setFormData({ ...formData, lyrics: content })
+                  }
                 />
               </div>
             </div>
           </div>
         </div>
 
+        {/* Sidebar */}
         <div className="space-y-6">
           <div className="rounded-[2.5rem] border border-neutral-100 bg-white p-10 shadow-sm space-y-8">
             <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-neutral-400">
@@ -179,15 +204,20 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
             </h3>
 
             <div className="space-y-3">
-              <Label htmlFor="songNumber" className="text-xs font-bold uppercase tracking-widest text-neutral-400">
+              <Label
+                htmlFor="songNo"
+                className="text-xs font-bold uppercase tracking-widest text-neutral-400"
+              >
                 Song Number
               </Label>
               <Input
-                id="songNumber"
+                id="songNo"
                 type="number"
                 placeholder="001"
-                value={formData.songNumber}
-                onChange={(e) => setFormData({ ...formData, songNumber: e.target.value })}
+                value={formData.songNo}
+                onChange={(e) =>
+                  setFormData({ ...formData, songNo: e.target.value })
+                }
                 className="h-12 rounded-xl border-neutral-100 bg-neutral-50/50"
               />
             </div>
@@ -199,7 +229,9 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
               </Label>
               <Select
                 value={formData.language}
-                onValueChange={(val) => setFormData({ ...formData, language: val as any })}
+                onValueChange={(val) =>
+                  setFormData({ ...formData, language: val })
+                }
               >
                 <SelectTrigger className="h-12 rounded-xl border-neutral-100 bg-neutral-50/50">
                   <SelectValue placeholder="Language" />
@@ -212,58 +244,66 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
               </Select>
             </div>
 
-            <div className="space-y-3 pt-4 border-t border-neutral-50">
-              <Label className="text-xs font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2">
-                <TagIcon className="h-3 w-3" />
-                Tags
+            <div className="space-y-3">
+              <Label className="text-xs font-bold uppercase tracking-widest text-neutral-400">
+                Category
               </Label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Hymn..."
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
-                  className="h-10 rounded-xl border-neutral-100 bg-neutral-50/50"
-                />
-                <Button type="button" variant="outline" onClick={addTag} className="rounded-xl h-10 border-neutral-100">
-                  Add
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-1.5 mt-3">
-                {formData.tags.map((tag: string) => (
-                  <span
-                    key={tag}
-                    className="flex items-center gap-1 rounded-full bg-neutral-50 border border-neutral-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-neutral-400"
-                  >
-                    {tag}
-                    <button type="button" onClick={() => removeTag(tag)}>
-                      <X className="h-2.5 w-2.5 hover:text-red-500 transition-colors" />
-                    </button>
-                  </span>
-                ))}
-              </div>
+              <Select
+                value={formData.category}
+                onValueChange={(val) =>
+                  setFormData({ ...formData, category: val })
+                }
+              >
+                <SelectTrigger className="h-12 rounded-xl border-neutral-100 bg-neutral-50/50">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-neutral-100">
+                  <SelectItem value="Worship">Worship</SelectItem>
+                  <SelectItem value="Praise">Praise</SelectItem>
+                  <SelectItem value="Christmas">Christmas</SelectItem>
+                  <SelectItem value="Lent">Lent</SelectItem>
+                  <SelectItem value="Hymn">Hymn</SelectItem>
+                  <SelectItem value="Special Songs">Special Songs</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-4 pt-6 mt-6 border-t border-neutral-50">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">Live Set</span>
-                <Switch
-                  checked={formData.isLive}
-                  onCheckedChange={(checked: boolean) => 
-                    setFormData({ ...formData, isLive: checked })
-                  }
-                />
-              </div>
+            <Separator className="bg-neutral-50" />
 
+            <div className="space-y-3">
+              <Label className="text-xs font-bold uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+                <User className="h-3 w-3" />
+                Author (Optional)
+              </Label>
+              <Input
+                placeholder="John Newton..."
+                value={formData.author}
+                onChange={(e) =>
+                  setFormData({ ...formData, author: e.target.value })
+                }
+                className="h-12 rounded-xl border-neutral-100 bg-neutral-50/50"
+              />
+            </div>
+
+            <Separator className="bg-neutral-50" />
+
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">Published</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">
+                  Published
+                </span>
                 <Switch
-                  checked={formData.status === "published"}
-                  onCheckedChange={(checked: boolean) => 
-                    setFormData({ ...formData, status: checked ? "published" : "draft" })
+                  checked={formData.isPublished}
+                  onCheckedChange={(checked: boolean) =>
+                    setFormData({ ...formData, isPublished: checked })
                   }
                 />
               </div>
+              <p className="text-[11px] text-neutral-400">
+                {formData.isPublished
+                  ? "Song is visible on the public site."
+                  : "Song is hidden from the public site."}
+              </p>
             </div>
           </div>
         </div>
@@ -271,6 +311,3 @@ export default function SongForm({ initialData, isEditing }: SongFormProps) {
     </form>
   );
 }
-
-// Ensure Switch is available
-import { Toggle as ButtonToggle } from "@/components/ui/toggle";
